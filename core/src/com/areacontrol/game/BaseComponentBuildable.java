@@ -7,13 +7,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-public class BuildableBaseComponent extends BaseComponent {
+public class BaseComponentBuildable extends BaseComponent {
 
 	int     queued; 
+	int     count;
 	float   timeLeft;
 	boolean inProgress;
 	
-	public BuildableBaseComponent(String n,Base parent) {
+	public BaseComponentBuildable(String n,Base parent) {
 		super(n,parent);
 		queued       =     0;
 		timeLeft     =     0;
@@ -115,6 +116,23 @@ public class BuildableBaseComponent extends BaseComponent {
 			else
 				upDateLabel("Name", name);	
 		}
+	}
+	
+	@Override
+	public void increaseCount() {
+		count += 1;
+		System.out.println("Increasing count of" + name + " to " + count);
+	}
+	
+	public void decreaseCount() {
+		// TODO Auto-generated method stub
+		count--;
+	}
+
+	@Override
+	public int getCount() {
+		// TODO Auto-generated method stub
+		return count;
 	}
 
 }

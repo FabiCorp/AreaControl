@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+
 
 public class Base extends Actor {
 	Texture texture = new Texture(Gdx.files.internal("BaseIcon.png"));
@@ -28,9 +28,9 @@ public class Base extends Actor {
 		unitsToSend = new BaseComponentContainer();
 		
 		components = new ArrayList<BaseComponent>();
-		components.add(new BuildableBaseComponent("Worker",this));
-		components.add(new BuildableBaseComponent("Barracks",this));
-		components.add(new BuildableBaseComponent("Research",this));
+		components.add(new BaseComponentBuildable("Worker",this));
+		components.add(new BaseComponentBuildable("Barracks",this));
+		components.add(new BaseComponentBuildable("Research",this));
 		
 		setBounds(baseX,baseY,texture.getWidth(),texture.getHeight());
 		
@@ -46,8 +46,8 @@ public class Base extends Actor {
 	public void takeAction(String string) {
 		for (BaseComponent baseComponent : components) {
 			if (string.equals(baseComponent.getName()) && 
-					baseComponent instanceof BuildableBaseComponent){
-				BuildableBaseComponent b = (BuildableBaseComponent) baseComponent;
+					baseComponent instanceof BaseComponentBuildable){
+				BaseComponentBuildable b = (BaseComponentBuildable) baseComponent;
 				b.initiateBuild();
 			}
 		}
@@ -95,11 +95,17 @@ public class Base extends Actor {
 				BaseComponent b = hasComponent(baseComponent.getName());	
 				if (b != null && b.getCount()>0 && hasComponent(newElement)==null) {
 					//System.out.println("Finished " + baseComponent.getName() + " making: " + newElement);
-					BuildableBaseComponent n1 = new BuildableBaseComponent(newElement,this);
-					newComponents.add(n1);
+					
+					
 					if (GameGlobals.baseComponentData.get(newElement).isUnit()){
-						BaseComponent n2 = new BaseComponent(newElement,this);
+						BaseComponentBuildableUnit n1 = new BaseComponentBuildableUnit(newElement,this);
+						newComponents.add(n1);
+						BaseComponent n2 = new BaseComponentUnit(newElement,this);
 						newComponents.add(n2);						
+					}
+					else{
+						BaseComponentBuildable n1 = new BaseComponentBuildable(newElement,this);
+						newComponents.add(n1);
 					}
 					
 					created = true;
@@ -119,60 +125,58 @@ public class Base extends Actor {
 	
 	public void moveUnitToSend(String name) {
 		// TODO Auto-generated method stub
-		BaseComponent from = null;
-		BaseComponent to   = null;
+		BaseComponentBuildableUnit from = null;
+		BaseComponentUnit to   = null;
 		
 		for (BaseComponent baseComponent : components) {
 			if (baseComponent.getName().equals(name) &&
-					baseComponent instanceof BuildableBaseComponent) {
-				from = baseComponent;
+					baseComponent instanceof BaseComponentBuildableUnit) {
+				from = (BaseComponentBuildableUnit) baseComponent;
 			}
 		}
 		
 		for (BaseComponent baseComponent : components) {
+			System.out.println(baseComponent.getName() + " is type " + (baseComponent instanceof BaseComponentUnit));
 			if (baseComponent.getName().equals(name) &&
-					!(baseComponent instanceof BuildableBaseComponent)) {
-				to = baseComponent;
+					baseComponent instanceof BaseComponentUnit) {
+				to = (BaseComponentUnit) baseComponent;
 			}
 		}
 		
+		System.out.println(from + " " + to + " c: " + from.getCount());
 		if (from != null && to != null && from.getCount()>0){
-			from.decreaseCount();
-			to.increaseCount();
+			Unit u = from.removeUnit();
+			to.addUnit(u);
 			System.out.println("Moving one " + name + " to send out");
 		}
 	}
 	public void moveUnitFromSend(String name) {
 		// TODO Auto-generated method stub
-		BaseComponent from = null;
-		BaseComponent to   = null;
+		BaseComponentUnit from          = null;
+		BaseComponentBuildableUnit to   = null;
 		
 		for (BaseComponent baseComponent : components) {
 			if (baseComponent.getName().equals(name) &&
-					!(baseComponent instanceof BuildableBaseComponent)) {
-				from = baseComponent;
+					!(baseComponent instanceof BaseComponentUnit)) {
+				from = (BaseComponentUnit) baseComponent;
 			}
 		}
 		
 		for (BaseComponent baseComponent : components) {
 			if (baseComponent.getName().equals(name) &&
-					(baseComponent instanceof BuildableBaseComponent)) {
-				to = baseComponent;
+					(baseComponent instanceof BaseComponentBuildableUnit)) {
+				to = (BaseComponentBuildableUnit) baseComponent;
 			}
 		}
 		
 		if (from != null && to != null && from.getCount()>0){
-			from.decreaseCount();
-			to.increaseCount();
+			Unit u = from.removeUnit();
+			to.addUnit(u);
 			System.out.println("Moving one " + name + " back to barracks");
 		}
 	}
 	public void sendUnits() {
 		// TODO Auto-generated method stub
-		if (unitsToSend.isActivated()) {
-			// units have already been put into the container (2nd click)
-			unitsToSend = new BaseComponentContainer();
-		}
 		
 		unitsToSend.activate(); // this changes the behavior of the click on the units in the base
 	}

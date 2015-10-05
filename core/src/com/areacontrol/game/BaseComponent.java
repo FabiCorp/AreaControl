@@ -8,10 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-public class BaseComponent {
+public abstract class BaseComponent {
 
 	protected String name;
-	int              count;
+
 	protected Base parent;
 	protected Map<String,Label> elements;
 	
@@ -29,13 +29,9 @@ public class BaseComponent {
 		this.name = name;
 	}
 
-	public void increaseCount() {
-		count += 1;
-		System.out.println("Increasing count of" + name + " to " + count);
-	}
-
+	
 	public String generateLabel() {
-		return name + count;
+		return name + getCount();
 	}
 
 	public void register(String s, Label label) {
@@ -54,7 +50,7 @@ public class BaseComponent {
 		register("Name", nameElement);
 		
 		if (GameGlobals.baseComponentData.get(name).isUnit()){
-			TextButton clabel = new TextButton(" "+count, baseDialog.getSkin());
+			TextButton clabel = new TextButton(" "+getCount(), baseDialog.getSkin());
 			baseDialog.add(clabel);
 			register("Count", clabel.getLabel());
 			clabel.addListener(new ClickListener() {		
@@ -66,7 +62,7 @@ public class BaseComponent {
 		}
 		else
 		{
-			Label  clabel = new Label(" "+count, baseDialog.getSkin());
+			Label  clabel = new Label(" "+getCount(), baseDialog.getSkin());
 			baseDialog.add(clabel);
 			register("Count", clabel);
 		}
@@ -79,17 +75,11 @@ public class BaseComponent {
 	
 		if (GameGlobals.baseDialog != null && GameGlobals.baseDialog.getBase() == parent &&
 			parent.getOwner() == GameGlobals.playerID){
-			upDateLabel("Count","" + count);
+			upDateLabel("Count","" + getCount());
 		}
 	}
 
-	public int getCount() {
-		return count;
-	}
-	
-	public void decreaseCount() {
-		// TODO Auto-generated method stub
-		count--;
-	}
+	public abstract int  getCount();
+	public abstract void increaseCount();
 
 }

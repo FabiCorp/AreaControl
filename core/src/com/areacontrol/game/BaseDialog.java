@@ -23,7 +23,7 @@ public class BaseDialog extends Table {
 		add(new Label("Player:"+base.getOwner(),GameGlobals.skin));
 		row();
 		for (BaseComponent bc : base.getComponents()) {
-			if (bc instanceof BuildableBaseComponent){
+			if (bc instanceof BaseComponentBuildable){
 				bc.makeDialog(this);
 			}
 		}
@@ -39,7 +39,7 @@ public class BaseDialog extends Table {
 		add(sendButton);
 		row();
 		for (BaseComponent bc : base.getComponents()) {
-			if (!(bc instanceof BuildableBaseComponent)){
+			if (!(bc instanceof BaseComponentBuildable)){
 				bc.makeDialog(this);
 			}
 		}	
