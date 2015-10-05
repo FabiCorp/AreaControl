@@ -1,9 +1,12 @@
 package com.areacontrol.game;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 
 public class BaseDialog extends Table {
@@ -15,7 +18,7 @@ public class BaseDialog extends Table {
 		super(skin);
 		this.parent = base;
 		
-		setPosition(500, 400);
+		setPosition(500, 300);
 
 		add(new Label("Player:"+base.getOwner(),GameGlobals.skin));
 		row();
@@ -24,7 +27,16 @@ public class BaseDialog extends Table {
 				bc.makeDialog(this);
 			}
 		}
-		add(new Label("Units to Send",GameGlobals.skin));
+		
+		TextButton sendButton = new TextButton("Units To Send", GameGlobals.skin);
+		sendButton.addListener(new ClickListener() {		
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				parent.sendUnits();
+			}
+		});
+		
+		add(sendButton);
 		row();
 		for (BaseComponent bc : base.getComponents()) {
 			if (!(bc instanceof BuildableBaseComponent)){

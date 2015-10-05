@@ -40,7 +40,7 @@ public class GameGlobals {
 		b.addUnitBuilt("AirBase");
 		
 		baseComponentData.put("AirBase" ,  b = new BaseComponentData( 150, 0,  5,20.0f, false, ""));
-		b.addUnitBuilt("Plane");
+		b.addUnitBuilt("Bomber");
 		
 		baseComponentData.put("Research",  b = new BaseComponentData( 300, 0,  1,30.0f, false, ""));
 		b.addUnitBuilt("Shields");
@@ -54,7 +54,7 @@ public class GameGlobals {
 		baseComponentData.put("Marine",    new BaseComponentData(  50, 0, 20,10.0f, true, "Barracks"));
 		baseComponentData.put("Spy",       new BaseComponentData( 200, 1, 10,10.0f, true, "Barracks"));
 		baseComponentData.put("Tank",      new BaseComponentData( 200, 0, 20,10.0f, true, "Factory"));
-		baseComponentData.put("Plane",      new BaseComponentData( 200, 0, 20,10.0f, true, "AirBase"));
+		baseComponentData.put("Bomber",    new BaseComponentData( 200, 0, 20,10.0f, true, "AirBase"));
 		
 		
 	}

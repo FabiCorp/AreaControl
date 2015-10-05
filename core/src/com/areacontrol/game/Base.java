@@ -13,7 +13,8 @@ public class Base extends Actor {
 	float baseX = 0, baseY = 0;
 	//public boolean started = false;
 	private int owner;
-		
+	
+	private BaseComponentContainer unitsToSend;
 	private ArrayList<BaseComponent> components;
 	
 	public ArrayList<BaseComponent> getComponents() {
@@ -23,6 +24,9 @@ public class Base extends Actor {
 		baseX = x;
 		baseY = y;
 		owner = 0;
+		
+		unitsToSend = new BaseComponentContainer();
+		
 		components = new ArrayList<BaseComponent>();
 		components.add(new BuildableBaseComponent("Worker",this));
 		components.add(new BuildableBaseComponent("Barracks",this));
@@ -33,6 +37,7 @@ public class Base extends Actor {
 		addListener(new BaseDialogListener(this)); 
 		setTouchable(Touchable.enabled);
 	}
+	
 	@Override
 	public void draw(Batch batch, float alpha){
 		batch.draw(texture,baseX,baseY,100,100);
@@ -56,14 +61,12 @@ public class Base extends Actor {
 		this.owner = owner;
 	}
 
-	
 	public int getWorkers() {
 		for (BaseComponent baseComponent : components) {
 			if (baseComponent.getName().equals("Worker")){
 				return baseComponent.getCount();
 			}
 		}
-	//	throw (IllegalStateException);
 		return 0;
 	}
 
@@ -163,6 +166,15 @@ public class Base extends Actor {
 			to.increaseCount();
 			System.out.println("Moving one " + name + " back to barracks");
 		}
+	}
+	public void sendUnits() {
+		// TODO Auto-generated method stub
+		if (unitsToSend.isActivated()) {
+			// units have already been put into the container (2nd click)
+			unitsToSend = new BaseComponentContainer();
+		}
+		
+		unitsToSend.activate(); // this changes the behavior of the click on the units in the base
 	}
 	
 	
