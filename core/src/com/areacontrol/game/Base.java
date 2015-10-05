@@ -87,7 +87,7 @@ public class Base extends Actor {
 		
 		boolean created = false;
 		
-		ArrayList<BaseComponent> newComponents = new ArrayList<>();
+		ArrayList<BaseComponent> newComponents = new ArrayList<BaseComponent>();
 		
 		for (BaseComponent baseComponent : components) {
 			ArrayList<String> enables = GameGlobals.baseComponentData.get(baseComponent.getName()).enables();
