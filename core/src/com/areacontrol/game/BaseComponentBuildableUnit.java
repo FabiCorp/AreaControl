@@ -2,27 +2,24 @@ package com.areacontrol.game;
 
 import java.util.ArrayList;
 
-public class BaseComponentBuildableUnit extends BaseComponentBuildable {
+public class BaseComponentBuildableUnit extends BaseComponent {
 
-	ArrayList<Unit> units;
+	ArrayList<Unit>    units;
+	BaseComponentUnit  unitStore;
+	
+
 	public BaseComponentBuildableUnit(String name, Base parent) {
 		super(name, parent);
-		// TODO Auto-generated constructor stub
-		units = new ArrayList<Unit>();
+		units     = new ArrayList<Unit>();
+		unitStore = new BaseComponentUnit(name,parent,this); 
 	}
 
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return units.size();
 	}
 
-	@Override
-	public void increaseCount() {
-		// TODO Auto-generated method stub
-		units.add(new Unit(name));
-	}
-
+	
 	public void addUnit(Unit u){
 		units.add(u);
 	}
@@ -39,4 +36,21 @@ public class BaseComponentBuildableUnit extends BaseComponentBuildable {
 		return null;
 	}
 
+	@Override
+	protected void makeNewElement() {
+		// TODO Auto-generated method stub
+		units.add(new Unit(name));
+	}
+
+	@Override
+	public void moveUnit() {
+		if (units.size()>0){
+			Unit u = units.remove(0);
+			unitStore.addUnit(u);
+		}
+	}
+
+	public BaseComponentUnit getUnitStore() {
+		return unitStore;
+	}
 }

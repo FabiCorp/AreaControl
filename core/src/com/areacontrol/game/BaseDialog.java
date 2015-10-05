@@ -22,8 +22,15 @@ public class BaseDialog extends Table {
 
 		add(new Label("Player:"+base.getOwner(),GameGlobals.skin));
 		row();
+		// Buildings
 		for (BaseComponent bc : base.getComponents()) {
 			if (bc instanceof BaseComponentBuildable){
+				bc.makeDialog(this);
+			}
+		}
+		// Units 
+		for (BaseComponent bc : base.getComponents()) {
+			if (bc instanceof BaseComponentBuildableUnit ){
 				bc.makeDialog(this);
 			}
 		}
@@ -39,7 +46,7 @@ public class BaseDialog extends Table {
 		add(sendButton);
 		row();
 		for (BaseComponent bc : base.getComponents()) {
-			if (!(bc instanceof BaseComponentBuildable)){
+			if (bc instanceof BaseComponentUnit){
 				bc.makeDialog(this);
 			}
 		}	

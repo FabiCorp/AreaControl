@@ -45,11 +45,8 @@ public class Base extends Actor {
 
 	public void takeAction(String string) {
 		for (BaseComponent baseComponent : components) {
-			if (string.equals(baseComponent.getName()) && 
-					baseComponent instanceof BaseComponentBuildable){
-				BaseComponentBuildable b = (BaseComponentBuildable) baseComponent;
-				b.initiateBuild();
-			}
+			if (string.equals(baseComponent.getName()))
+				baseComponent.initiateBuild();
 		}
 	}
 
@@ -100,14 +97,12 @@ public class Base extends Actor {
 					if (GameGlobals.baseComponentData.get(newElement).isUnit()){
 						BaseComponentBuildableUnit n1 = new BaseComponentBuildableUnit(newElement,this);
 						newComponents.add(n1);
-						BaseComponent n2 = new BaseComponentUnit(newElement,this);
-						newComponents.add(n2);						
+						newComponents.add(n1.getUnitStore());						
 					}
 					else{
 						BaseComponentBuildable n1 = new BaseComponentBuildable(newElement,this);
 						newComponents.add(n1);
 					}
-					
 					created = true;
 				}
 			}
@@ -179,6 +174,10 @@ public class Base extends Actor {
 		// TODO Auto-generated method stub
 		
 		unitsToSend.activate(); // this changes the behavior of the click on the units in the base
+	}
+	public void addComponent(BaseComponentUnit unitStore) {
+		// TODO Auto-generated method stub
+		components.add(unitStore);
 	}
 	
 	
