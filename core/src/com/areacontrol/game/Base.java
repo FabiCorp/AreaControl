@@ -14,7 +14,7 @@ public class Base extends Actor {
 	//public boolean started = false;
 	private int owner;
 	
-	private BaseComponentContainer unitsToSend;
+	
 	private ArrayList<BaseComponent> components;
 	
 	public ArrayList<BaseComponent> getComponents() {
@@ -24,9 +24,7 @@ public class Base extends Actor {
 		baseX = x;
 		baseY = y;
 		owner = 0;
-		
-		unitsToSend = new BaseComponentContainer();
-		
+					
 		components = new ArrayList<BaseComponent>();
 		components.add(new BaseComponentBuildable("Worker",this));
 		components.add(new BaseComponentBuildable("Barracks",this));
@@ -172,8 +170,12 @@ public class Base extends Actor {
 	}
 	public void sendUnits() {
 		// TODO Auto-generated method stub
-		
-		unitsToSend.activate(); // this changes the behavior of the click on the units in the base
+		UnitContainer unitsToSend = new UnitContainer();
+		for (BaseComponent baseComponent : components) {
+			if (baseComponent instanceof BaseComponentUnit){
+				((BaseComponentUnit) baseComponent).moveUnits(unitsToSend);
+			}
+		}
 	}
 	public void addComponent(BaseComponentUnit unitStore) {
 		// TODO Auto-generated method stub
