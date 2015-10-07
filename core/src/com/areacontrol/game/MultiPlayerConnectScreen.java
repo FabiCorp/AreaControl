@@ -66,60 +66,146 @@
  */
 package com.areacontrol.game;
 
-import java.util.ArrayList;
+import appwarp.WarpController;
+import appwarp.WarpListener;
 
-public class BaseComponentData {
-	private int     resourceCost;
-	private int     minPerBase;   // only occupied bases
-	private int     maxPerBase;
-	private float   buildTime;
-	private boolean isUnit;
-	private String  builtBy;      // the building which makes the unit or building 
+import java.util.Random;
+
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
+
+public class MultiPlayerConnectScreen implements Screen, WarpListener {
+	Game game;
+	Label label;
+	private final String tryingToConnect = "Connecting to AppWarp";
+	private final String waitForOtherUser = "Waiting for Other User";
+	private final String errorInConnection = "Error in Connection Go Back";
 	
-	ArrayList<String> builds;
-	public BaseComponentData(int resourceCost,int minPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy){
-		this.resourceCost = resourceCost;
-		this.maxPerBase   = maxPerBase;
-		this.minPerBase   = minPerBase;
-		this.buildTime    = buildTime;
-		this.isUnit  	  = isUnit;
-		this.builtBy      = builtBy;
+	private final String game_win   = "Congrats You Win!";
+	private final String game_loose = "Oops You Loose!";
+	private final String enemy_left = "Congrats You Win 2!";
+	
+	private String msg = tryingToConnect;
+	
+	Stage mainScreen;
+	
+	public MultiPlayerConnectScreen (Game game) {
+		this.game = game;
+		WarpController.getInstance().startApp(getRandomHexString(10));
+		mainScreen = new Stage(); 
+		label = new Label(msg,Assets.skin);
+		label.setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, Align.center);
+		mainScreen.addActor(label);
+		WarpController.getInstance().setListener(this);
+	}
+
+	public void update () {
+		label.setText(this.msg);
+		if (Gdx.input.justTouched()) {
+/*			guiCam.unproject(touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0));
+   Going Back here
+			if (backBounds.contains(touchPoint.x, touchPoint.y)) {
+				Assets.playSound(Assets.clickSound);
+				game.setScreen(new MainMenuScreen(game));
+				WarpController.getInstance().handleLeave();
+				return;
+			}
+			*/
+		}
+	}
+
+	public void draw () {
+		Gdx.gl.glClearColor(.0f, .255f, .255f, 1);	
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		mainScreen.act(Gdx.graphics.getDeltaTime());
+		mainScreen.draw();
+	}
+
+	@Override
+	public void render (float delta) {
+		update();
+		draw();
+	}
+
+	@Override
+	public void resize (int width, int height) {
+	}
+
+	@Override
+	public void show () {
+	}
+
+	@Override
+	public void hide () {
+	}
+
+	@Override
+	public void pause () {
+	}
+
+	@Override
+	public void resume () {
+	}
+
+	@Override
+	public void dispose () {
+	}
+	
+	@Override
+	public void onError (String message) {
+		this.msg = errorInConnection;
+		update();
+	}
+
+	@Override
+	public void onGameStarted (String message) {
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run () {
+				System.out.println("Starting Multiplayer");
+				game.setScreen(new MultiplayerGameScreen(game));
+			}
+		});
 		
-		builds = new ArrayList<String>();
 	}
 
-	public void addUnitBuilt(String s){
-		builds.add(s);
+	@Override
+	public void onGameFinished (int code, boolean isRemote) {
+		if(code==WarpController.GAME_WIN){
+			this.msg = game_loose;
+		}else if(code==WarpController.GAME_LOOSE){
+			this.msg = game_win;
+		}else if(code==WarpController.ENEMY_LEFT){
+			this.msg = enemy_left;
+		}
+		System.out.println("We are now in the Connect Screen Again");
+		//update();
+		game.setScreen(new MainMenuScreen(game));
 	}
 	
-	public ArrayList<String> enables(){
-		return builds;
-	}
-	
-	public int getResourceCost() {
-		return resourceCost;
+	@Override
+	public void onGameUpdateReceived (String message) {
+		
 	}
 
-	public float getBuildTime() {
-		return buildTime;
+	@Override
+	public void onWaitingStarted(String message) {
+		this.msg = waitForOtherUser;
+		update();
 	}
 
-	public boolean isUnit() {
-		return isUnit;
-	}
-
-	public String getBuiltBy() {
-		return builtBy;
-	}
-
-	public int getMinPerBase() {
-		return minPerBase;
-	}
-
-	public int getMaxPerBase() {
-		return maxPerBase;
-	}
-
-
-
+	private String getRandomHexString(int numchars){
+	      Random r = new Random();
+	      StringBuffer sb = new StringBuffer();
+	      while(sb.length() < numchars){
+	          sb.append(Integer.toHexString(r.nextInt()));
+	      }
+	      return sb.toString().substring(0, numchars);
+	  }
 }

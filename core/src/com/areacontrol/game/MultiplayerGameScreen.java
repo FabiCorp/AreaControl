@@ -66,60 +66,105 @@
  */
 package com.areacontrol.game;
 
-import java.util.ArrayList;
+import org.json.JSONObject;
 
-public class BaseComponentData {
-	private int     resourceCost;
-	private int     minPerBase;   // only occupied bases
-	private int     maxPerBase;
-	private float   buildTime;
-	private boolean isUnit;
-	private String  builtBy;      // the building which makes the unit or building 
+import appwarp.WarpController;
+import appwarp.WarpListener;
+
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+
+public class MultiplayerGameScreen extends GameScreen implements Screen, WarpListener {
+
+	public MultiplayerGameScreen (Game game) {
+		super(game);
+		WarpController.getInstance().setListener(this);
+	}
 	
-	ArrayList<String> builds;
-	public BaseComponentData(int resourceCost,int minPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy){
-		this.resourceCost = resourceCost;
-		this.maxPerBase   = maxPerBase;
-		this.minPerBase   = minPerBase;
-		this.buildTime    = buildTime;
-		this.isUnit  	  = isUnit;
-		this.builtBy      = builtBy;
+	@Override
+	protected void clickedButton(){
+		sendLocation(0, 0, 0, 0);
+	}
+	
+	private void sendLocation(float x, float y, float width, float height){
 		
-		builds = new ArrayList<String>();
-	}
-
-	public void addUnitBuilt(String s){
-		builds.add(s);
+		try {
+			JSONObject data = new JSONObject();
+			data.put("x", x);
+			data.put("y", y);
+			data.put("width", width);
+			data.put("height", height);
+			WarpController.getInstance().sendGameUpdate(data.toString());
+			
+		} catch (Exception e) {
+			// exception in sendLocation
+		}
 	}
 	
-	public ArrayList<String> enables(){
-		return builds;
-	}
-	
-	public int getResourceCost() {
-		return resourceCost;
-	}
-
-	public float getBuildTime() {
-		return buildTime;
+	@Override
+	protected void gameOver() {
+		if (Gdx.input.justTouched()) {
+			WarpController.getInstance().handleLeave();
+			game.setScreen(new MainMenuScreen(game));
+		}
 	}
 
-	public boolean isUnit() {
-		return isUnit;
+	private void handleLeaveGame(){
+		WarpController.getInstance().handleLeave();
 	}
 
-	public String getBuiltBy() {
-		return builtBy;
+	@Override
+	public void onWaitingStarted (String message) {
 	}
 
-	public int getMinPerBase() {
-		return minPerBase;
+	@Override
+	public void onError (String message) {
 	}
 
-	public int getMaxPerBase() {
-		return maxPerBase;
+	@Override
+	public void onGameStarted (String message) {
+		
 	}
 
+	@Override
+	public void onGameFinished (int code, boolean isRemote) {
+		if(isRemote){
+			//prevScreen.onGameFinished(code, true);
+			System.out.println("Detected Remote");
+		}else{
+			if(code==WarpController.GAME_WIN){
+				System.out.println("WIN MESSAGE");
+				//world.state = World.WORLD_STATE_NEXT_LEVEL;
+			}else if(code==WarpController.GAME_LOOSE){
+				System.out.println("LOOSE MESSAGE");
+				//world.state = World.WORLD_STATE_GAME_OVER;
+			}
+		}
+		WarpController.getInstance().handleLeave();
+	}
 
-
+	@Override
+	public void onGameUpdateReceived (String message) {
+		try {
+			JSONObject data = new JSONObject(message);
+			float x = (float)data.getDouble("x");
+			float y = (float)data.getDouble("y");
+			float width = (float)data.getDouble("width");
+			float height = (float)data.getDouble("height");
+			//System.out.println("Received Data");
+			//Assets.clicksByOther++;
+			//msg.setText("Player:  " + Assets.playerID + " Clicked: " + Assets.clicksByOther);
+			
+			//renderer.updateEnemyLocation(x, y, width, height);
+		} catch (Exception e) {
+			// exception in onMoveNotificationReceived
+		}
+	}
 }

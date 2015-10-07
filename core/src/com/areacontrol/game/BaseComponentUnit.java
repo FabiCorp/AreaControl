@@ -64,62 +64,97 @@
  *  a license.
  *  This license explicitly does not cover the external and linked software.
  */
+
 package com.areacontrol.game;
 
 import java.util.ArrayList;
 
-public class BaseComponentData {
-	private int     resourceCost;
-	private int     minPerBase;   // only occupied bases
-	private int     maxPerBase;
-	private float   buildTime;
-	private boolean isUnit;
-	private String  builtBy;      // the building which makes the unit or building 
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+
+public class BaseComponentUnit extends BaseComponent {
+
+	ArrayList<Unit> units;
+	BaseComponentBuildableUnit maker;
+	public BaseComponentUnit(String name, Base parent, BaseComponentBuildableUnit maker) {
+		super(name, parent);
+		this.maker = maker;
+		units = new ArrayList<Unit>();
+	}
+
+	@Override
+	public void makeDialog(BaseDialog baseDialog) {
+		String label = getName();
+
+		Label nameElement = new Label(label,baseDialog.getSkin());
+		baseDialog.add(nameElement);
+		register("Name", nameElement);
+
+		if (Assets.baseComponentData.get(name).isUnit()){
+			TextButton clabel = new TextButton(" "+getCount(), baseDialog.getSkin());
+			baseDialog.add(clabel);
+			register("Count", clabel.getLabel());
+			clabel.addListener(new ClickListener() {		
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					moveUnit();
+				}
+			});
+		}
+		else
+		{
+			Label  clabel = new Label(" "+getCount(), baseDialog.getSkin());
+			baseDialog.add(clabel);
+			register("Count", clabel);
+		}
+		baseDialog.row();
+	}
+
+	@Override
+	public int getCount() {
+		return units.size();
+	}
+
+	public void addUnit(Unit u){
+		units.add(u);
+	}
 	
-	ArrayList<String> builds;
-	public BaseComponentData(int resourceCost,int minPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy){
-		this.resourceCost = resourceCost;
-		this.maxPerBase   = maxPerBase;
-		this.minPerBase   = minPerBase;
-		this.buildTime    = buildTime;
-		this.isUnit  	  = isUnit;
-		this.builtBy      = builtBy;
+	public Unit removeUnit() {		
+		try
+		{
+			return units.remove(0);
+		} catch  (IndexOutOfBoundsException e) {
+		    System.err.println("IndexOutOfBoundsException: " + e.getMessage()); 
+		} 
+		return null;
+	}
+
+	@Override
+	protected void makeNewElement() {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public void update() {
+		upDateLabel("Count", ""+getCount());	
+	}
+	
+	@Override
+	public void moveUnit() {
+	   if (units.size()>0) {
+		   Unit u = units.remove(0);
+		   maker.addUnit(u);
+	   }
 		
-		builds = new ArrayList<String>();
 	}
 
-	public void addUnitBuilt(String s){
-		builds.add(s);
+	public void moveUnits(UnitContainer unitsToSend) {
+		while (units.size()>0){
+			Unit a = units.remove(0);
+			unitsToSend.addUnits(a);
+		}
+			
 	}
-	
-	public ArrayList<String> enables(){
-		return builds;
-	}
-	
-	public int getResourceCost() {
-		return resourceCost;
-	}
-
-	public float getBuildTime() {
-		return buildTime;
-	}
-
-	public boolean isUnit() {
-		return isUnit;
-	}
-
-	public String getBuiltBy() {
-		return builtBy;
-	}
-
-	public int getMinPerBase() {
-		return minPerBase;
-	}
-
-	public int getMaxPerBase() {
-		return maxPerBase;
-	}
-
-
-
 }

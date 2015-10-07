@@ -66,60 +66,30 @@
  */
 package com.areacontrol.game;
 
-import java.util.ArrayList;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-public class BaseComponentData {
-	private int     resourceCost;
-	private int     minPerBase;   // only occupied bases
-	private int     maxPerBase;
-	private float   buildTime;
-	private boolean isUnit;
-	private String  builtBy;      // the building which makes the unit or building 
+public class MainScreenListener extends ClickListener {
+	private Base        base;
+	private GameScreen  game;
 	
-	ArrayList<String> builds;
-	public BaseComponentData(int resourceCost,int minPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy){
-		this.resourceCost = resourceCost;
-		this.maxPerBase   = maxPerBase;
-		this.minPerBase   = minPerBase;
-		this.buildTime    = buildTime;
-		this.isUnit  	  = isUnit;
-		this.builtBy      = builtBy;
+	public MainScreenListener(Base base,GameScreen game){
+		this.base = base;
+		this.game = game; 
+	}
+	public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 		
-		builds = new ArrayList<String>();
+		if (game.getGameState() instanceof GameStateSendUnits)
+		{
+			((GameStateSendUnits) game.getGameState()).sendUnitsTo(base);
+		}
+		else
+		{
+			BaseDialog bd = new BaseDialog(base,Assets.skin);
+			Assets.registerDialog(bd);
+			base.getStage().addActor(bd);
+		}
+		
+		return true;
 	}
-
-	public void addUnitBuilt(String s){
-		builds.add(s);
-	}
-	
-	public ArrayList<String> enables(){
-		return builds;
-	}
-	
-	public int getResourceCost() {
-		return resourceCost;
-	}
-
-	public float getBuildTime() {
-		return buildTime;
-	}
-
-	public boolean isUnit() {
-		return isUnit;
-	}
-
-	public String getBuiltBy() {
-		return builtBy;
-	}
-
-	public int getMinPerBase() {
-		return minPerBase;
-	}
-
-	public int getMaxPerBase() {
-		return maxPerBase;
-	}
-
-
-
 }

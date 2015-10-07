@@ -66,60 +66,105 @@
  */
 package com.areacontrol.game;
 
-import java.util.ArrayList;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
-public class BaseComponentData {
-	private int     resourceCost;
-	private int     minPerBase;   // only occupied bases
-	private int     maxPerBase;
-	private float   buildTime;
-	private boolean isUnit;
-	private String  builtBy;      // the building which makes the unit or building 
+import appwarp.WarpController;
+
+public class MainMenuScreen implements Screen {
+
+	final Game  game;
+	Stage mainScreen;
 	
-	ArrayList<String> builds;
-	public BaseComponentData(int resourceCost,int minPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy){
-		this.resourceCost = resourceCost;
-		this.maxPerBase   = maxPerBase;
-		this.minPerBase   = minPerBase;
-		this.buildTime    = buildTime;
-		this.isUnit  	  = isUnit;
-		this.builtBy      = builtBy;
+	public MainMenuScreen(Game game){
+		this.game = game;
+		mainScreen = new Stage();
+		Gdx.input.setInputProcessor(mainScreen);
 		
-		builds = new ArrayList<String>();
-	}
-
-	public void addUnitBuilt(String s){
-		builds.add(s);
+		TextButton button;
+		final Game myGame = this.game;
+		button = new TextButton("Single Player",Assets.skin);
+		button.setPosition(Gdx.graphics.getWidth()/2, 0.75f*Gdx.graphics.getHeight(), Align.center);
+		button.addListener(new ClickListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				myGame.setScreen(new GameScreen(myGame));
+				return true;
+			}
+		});
+		mainScreen.addActor(button);
+		
+		button = new TextButton("Multiplayer",Assets.skin);
+		button.setPosition(Gdx.graphics.getWidth()/2, 
+				0.75f*Gdx.graphics.getHeight() - 2*button.getHeight() , Align.center);
+		button.addListener(new ClickListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				myGame.setScreen(new MultiPlayerConnectScreen(myGame));
+				return true;
+			}
+		});
+		mainScreen.addActor(button);
+		
+		button = new TextButton("Quit",Assets.skin);
+		button.setPosition(Gdx.graphics.getWidth()/2, 
+				0.75f*Gdx.graphics.getHeight() - 4*button.getHeight() , Align.center);
+		button.addListener(new ClickListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				Gdx.app.exit();
+				return true;
+			}
+		});
+		mainScreen.addActor(button);
 	}
 	
-	public ArrayList<String> enables(){
-		return builds;
-	}
-	
-	public int getResourceCost() {
-		return resourceCost;
+	@Override
+	public void show() {
+		// TODO Auto-generated method stub
 	}
 
-	public float getBuildTime() {
-		return buildTime;
+	@Override
+	public void render(float delta) {
+		// TODO Auto-generated method stub
+		Gdx.gl.glClearColor(.0f, .255f, .255f, 1);	
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        mainScreen.act(Gdx.graphics.getDeltaTime());
+        mainScreen.draw(); 
 	}
 
-	public boolean isUnit() {
-		return isUnit;
+	@Override
+	public void resize(int width, int height) {
+		// TODO Auto-generated method stub
+
 	}
 
-	public String getBuiltBy() {
-		return builtBy;
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+
 	}
 
-	public int getMinPerBase() {
-		return minPerBase;
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+
 	}
 
-	public int getMaxPerBase() {
-		return maxPerBase;
+	@Override
+	public void hide() {
+		// TODO Auto-generated method stub
+
 	}
 
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
 
+	}
 
 }

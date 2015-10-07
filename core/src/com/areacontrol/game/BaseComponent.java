@@ -34,26 +34,35 @@ public abstract class BaseComponent {
 	public void makeDialog(BaseDialog baseDialog) {
 		String label = getName();
 		
-		if (GameGlobals.playerID  == parent.getOwner() && 
-			GameGlobals.resources > GameGlobals.baseComponentData.get(name).getResourceCost()){
+		if (Assets.playerID  == parent.getOwner() && 
+			Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
 			label += "(B)";
 		}
 		
-		TextButton item = new TextButton(label,baseDialog.getSkin());
-		item.addListener(new ClickListener() {		
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				parent.takeAction(name);
-			}
-		});
 		
-		baseDialog.add(item);
-		register("Name", item.getLabel());
+		if (parent.getOwner() == Assets.playerID){
+			
+			TextButton item = new TextButton(label,baseDialog.getSkin());
+			item.addListener(new ClickListener() {		
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					parent.takeAction(name);
+				}
+			});
+			
+			baseDialog.add(item);
+			register("Name", item.getLabel());
+		} else
+		{
+			Label item = new Label(label,baseDialog.getSkin());		
+			baseDialog.add(item);
+			register("Name", item);
+		}
 			
 		final Label  rlabel = new Label(" "+(int) timeLeft, baseDialog.getSkin());
 		final Label  qlabel = new Label(" "+queued, baseDialog.getSkin());
 		
-		if (GameGlobals.baseComponentData.get(name).isUnit()){
+		if (Assets.baseComponentData.get(name).isUnit()){
 			TextButton clabel = new TextButton(" "+getCount(), baseDialog.getSkin());
 			baseDialog.add(clabel);
 			register("Count", clabel.getLabel());
@@ -79,13 +88,13 @@ public abstract class BaseComponent {
 	}
 	
 	public void initiateBuild() {
-		if (GameGlobals.resources > GameGlobals.baseComponentData.get(name).getResourceCost()){
-			GameGlobals.resources -= GameGlobals.baseComponentData.get(name).getResourceCost();
+		if (Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
+			Assets.resources -= Assets.baseComponentData.get(name).getResourceCost();
 			if (inProgress)
 				queued += 1;
 			else {
 				inProgress = true;
-				timeLeft   = GameGlobals.baseComponentData.get(name).getBuildTime();				
+				timeLeft   = Assets.baseComponentData.get(name).getBuildTime();				
 			}
 		}
 		
@@ -93,7 +102,7 @@ public abstract class BaseComponent {
 	
 	public void update() {
 		if (inProgress){
-			timeLeft -= GameGlobals.refreshTime;
+			timeLeft -= Assets.refreshTime;
 			if (timeLeft<0){
 				makeNewElement();
 				timeLeft   = 0.0f;
@@ -101,12 +110,12 @@ public abstract class BaseComponent {
 				if (queued > 0){
 					queued--;
 					inProgress = true;
-					timeLeft = GameGlobals.baseComponentData.get(name).getBuildTime();
+					timeLeft = Assets.baseComponentData.get(name).getBuildTime();
 				}
 			}
 			
-			if (GameGlobals.baseDialog != null && GameGlobals.baseDialog.getBase() == parent){
-				if (GameGlobals.resources > GameGlobals.baseComponentData.get(name).getResourceCost()){
+			if (Assets.baseDialog != null && Assets.baseDialog.getBase() == parent){
+				if (Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
 					upDateLabel("Name", name + "(B)");
 				}
 				upDateLabel("Time", "" + (int) timeLeft);
@@ -115,10 +124,10 @@ public abstract class BaseComponent {
 			}
 		}
 		
-		if (GameGlobals.baseDialog != null && GameGlobals.baseDialog.getBase() == parent &&
-			parent.getOwner() == GameGlobals.playerID){
+		if (Assets.baseDialog != null && Assets.baseDialog.getBase() == parent &&
+			parent.getOwner() == Assets.playerID){
 			upDateLabel("Count","" + getCount());
-			if (GameGlobals.resources > GameGlobals.baseComponentData.get(name).getResourceCost()){
+			if (Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
 				upDateLabel("Name", name + "(B)");
 			}
 			else
@@ -155,6 +164,6 @@ public abstract class BaseComponent {
 		}
 		
 	}
-	
+
 
 }
