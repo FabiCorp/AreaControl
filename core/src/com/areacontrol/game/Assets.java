@@ -13,7 +13,7 @@ public class Assets {
 	public static int   singlePlayerMode = 1;
 	public static int   multiPlayerMode  = 2;
 	
-	public static float refreshTime = 0.1f;
+	//public static float refreshTime = 0.1f;
 	
 	public static BaseDialog baseDialog = null;
 	public static int playerID  = 1;

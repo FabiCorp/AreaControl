@@ -141,10 +141,10 @@ public class Base extends Actor {
 		return null;
 	}
 	
-	public void update() {
+	public void update(float time) {
 				
 		for (BaseComponent baseComponent : components) {
-			baseComponent.update();
+			baseComponent.update(time);
 		}
 		// check if new baseComponents can be made
 		

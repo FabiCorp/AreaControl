@@ -137,7 +137,7 @@ public class BaseComponentUnit extends BaseComponent {
 	}
 
 	@Override
-	public void update() {
+	public void update(float time) {
 		upDateLabel("Count", ""+getCount());	
 	}
 	

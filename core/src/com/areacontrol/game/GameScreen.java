@@ -138,14 +138,14 @@ public class GameScreen implements Screen {
 	public void update(float time)
 	{	
 		for (UnitContainer units : unitsMoving) {
-			units.update();
+			units.update(time);
 		}
 		
 		for (Base base : bases) {
 			if (base.getOwner()==Assets.playerID) {
-				Assets.resources +=  base.getWorkers() * Assets.resourceRatePerWorker*Assets.refreshTime;
+				Assets.resources +=  base.getWorkers() * Assets.resourceRatePerWorker*time;
 			}
-			base.update();
+			base.update(time);
 		}
 		resCount.setText("Resources: " + (int) Assets.resources);
 	}

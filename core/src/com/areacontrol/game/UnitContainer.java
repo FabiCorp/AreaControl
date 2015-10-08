@@ -101,15 +101,11 @@ public class UnitContainer {
 		units.add(bc);
 	}
 
-	public void update() {
-		timeToArrival -= Assets.refreshTime;
+	public void update(float time) {
+		timeToArrival -= time;
 		if (timeToArrival<0){
 			System.out.println("Units arrived!");
 		}
-		else {
-			System.out.println("Units arriving in " + (int) timeToArrival);
-		}
-		
 	}
 
 	

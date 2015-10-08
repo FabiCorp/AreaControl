@@ -6,7 +6,12 @@ import com.areacontrol.game.AreaControl;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new AreaControl(), config);
+		try {
+			LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+			new LwjglApplication(new AreaControl(), config);
+		} catch (RuntimeException e) {
+			System.out.println("Caught: " + e);
+		}
+		
 	}
 }
