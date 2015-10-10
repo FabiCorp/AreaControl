@@ -5,9 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -18,6 +16,8 @@ public class ArenaScreen implements Screen {
 
 	protected Game  game;
 	protected Stage stage;
+	UnitContainer uc1;
+	UnitContainer uc2;
 	
 	public ArenaScreen(Game game) {
 		this.game  = game;
@@ -26,8 +26,8 @@ public class ArenaScreen implements Screen {
 	    Assets.skin = new Skin(Gdx.files.internal("data/uiskin.json"));
 		Gdx.input.setInputProcessor(stage);
 
-		UnitContainer uc1 = new UnitContainer();
-		UnitContainer uc2 = new UnitContainer();
+		uc1 = new UnitContainer();
+		uc2 = new UnitContainer();
 		
 		for (int i = 0; i < 5; i++)
 			uc1.addUnits(new Unit("Marine"));
@@ -45,9 +45,11 @@ public class ArenaScreen implements Screen {
             @Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
             	System.out.println("Starting Fight");
-            	// myGame.setScreen(new FightScreen(myGame, uc1, uc2, this));
+            	startFight();
 				return true;
 			}
+
+		
 		});
 		stage.addActor(button);
 		ypos -= 2*button.getHeight();
@@ -55,6 +57,10 @@ public class ArenaScreen implements Screen {
 		
 	}
 	
+	private void startFight() {
+		// TODO Auto-generated method stub
+		game.setScreen(new FightScreen(game, uc1, uc2, this));	
+	}
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
