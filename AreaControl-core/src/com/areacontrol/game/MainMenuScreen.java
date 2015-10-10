@@ -76,7 +76,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-import appwarp.WarpController;
 
 public class MainMenuScreen implements Screen {
 
@@ -89,32 +88,49 @@ public class MainMenuScreen implements Screen {
 		Gdx.input.setInputProcessor(mainScreen);
 		
 		TextButton button;
+		float ypos        =  0.75f*Gdx.graphics.getHeight();
 		final Game myGame = this.game;
 		button = new TextButton("Single Player",Assets.skin);
-		button.setPosition(Gdx.graphics.getWidth()/2, 0.75f*Gdx.graphics.getHeight(), Align.center);
+		button.setPosition(Gdx.graphics.getWidth()/2,ypos, Align.center);
 		button.addListener(new ClickListener(){
+                        @Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 				myGame.setScreen(new GameScreen(myGame));
 				return true;
 			}
 		});
 		mainScreen.addActor(button);
+		ypos -= 2*button.getHeight();
+		
+		button = new TextButton("Arena",Assets.skin);
+		button.setPosition(Gdx.graphics.getWidth()/2, ypos , Align.center);
+		button.addListener(new ClickListener(){
+                        @Override   
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				myGame.setScreen(new ArenaScreen(myGame));
+				return true;
+			}
+		});
+		mainScreen.addActor(button);
+		ypos -= 2*button.getHeight();
 		
 		button = new TextButton("Multiplayer",Assets.skin);
-		button.setPosition(Gdx.graphics.getWidth()/2, 
-				0.75f*Gdx.graphics.getHeight() - 2*button.getHeight() , Align.center);
+		button.setPosition(Gdx.graphics.getWidth()/2, ypos , Align.center);
 		button.addListener(new ClickListener(){
+                        @Override   
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 				myGame.setScreen(new MultiPlayerConnectScreen(myGame));
 				return true;
 			}
 		});
 		mainScreen.addActor(button);
+		ypos -= 2*button.getHeight();
+		
 		
 		button = new TextButton("Quit",Assets.skin);
-		button.setPosition(Gdx.graphics.getWidth()/2, 
-				0.75f*Gdx.graphics.getHeight() - 4*button.getHeight() , Align.center);
+		button.setPosition(Gdx.graphics.getWidth()/2, ypos , Align.center);
 		button.addListener(new ClickListener(){
+                        @Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 				Gdx.app.exit();
 				return true;

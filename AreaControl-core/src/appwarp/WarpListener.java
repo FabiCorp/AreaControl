@@ -1,5 +1,7 @@
 package appwarp;
 
+
+
 public interface WarpListener {
 	
 	public void onWaitingStarted(String message);
@@ -10,6 +12,6 @@ public interface WarpListener {
 	
 	public void onGameFinished(int code, boolean isRemote);
 	
-	public void onGameUpdateReceived(String message);
+	public void onGameUpdateReceived(WarpMessage msg);
 	
 }

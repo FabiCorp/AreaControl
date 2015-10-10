@@ -79,9 +79,8 @@ public class BaseDialog extends Table {
 
 	final   Base parent;
 	
-	
-	public BaseDialog(final Base base, Skin skin) {
-		super(skin);
+	public BaseDialog(final Base base) {
+		super(Assets.skin);
 		this.parent = base;
 		
 		setPosition(500, 300);

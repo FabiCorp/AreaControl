@@ -70,17 +70,17 @@ import java.util.ArrayList;
 
 public class BaseComponentData {
 	private int     resourceCost;
-	private int     minPerBase;   // only occupied bases
+	private int     startBase;   // only occupied bases
 	private int     maxPerBase;
 	private float   buildTime;
 	private boolean isUnit;
 	private String  builtBy;      // the building which makes the unit or building 
 	
 	ArrayList<String> builds;
-	public BaseComponentData(int resourceCost,int minPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy){
+	public BaseComponentData(int resourceCost,int startPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy){
 		this.resourceCost = resourceCost;
 		this.maxPerBase   = maxPerBase;
-		this.minPerBase   = minPerBase;
+		this.startBase    = startPerBase;
 		this.buildTime    = buildTime;
 		this.isUnit  	  = isUnit;
 		this.builtBy      = builtBy;
@@ -113,7 +113,7 @@ public class BaseComponentData {
 	}
 
 	public int getMinPerBase() {
-		return minPerBase;
+		return startBase;
 	}
 
 	public int getMaxPerBase() {

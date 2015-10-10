@@ -66,11 +66,66 @@
  */
 package com.areacontrol.game;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
+
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+
 public class Unit {
 	String name;
+	float  health;
+	Actor  actor;
+	
 	public Unit(String name) {
-		// TODO Auto-generated constructor stub
-		this.name = name;
+		this.name   = name;
+		this.health = 100;
+		this.actor = null;
+	}
+	
+	public String getName() {
+		return name;
 	}
 
+	public String generateSymbol() {
+		int hh = (int) health;
+		if (hh<0)
+			hh = 0;
+		return name.substring(0,1)+hh;
+	}
+	
+	public void registerActor(Actor a){
+		this.actor = a;
+	}
+
+	public void attack(Unit u){
+		float damage = Assets.randGen.nextFloat()*10; // take some shot
+		u.receiveDamage(damage);
+	}
+
+	private void receiveDamage(float damage) {
+		// TODO Auto-generated method stub
+		health -= damage;
+		if (actor != null){
+			((Label) actor).setText(generateSymbol());
+		}
+	}
+
+	public void attack(UnitContainer uc2) {
+		// ich bin: this.getName()!
+		
+		if (getName() == "Marine"){
+			// are there other marines left ? 
+			ArrayList<Unit> marines = uc2.getUnits("Marine");
+			// if yes: attack random marine 
+			if (marines.size()>0){
+				int i = Assets.randGen.nextInt(marines.size());
+				attack(marines.get(i));	
+			}
+			
+		
+			
+		}
+	}
 }

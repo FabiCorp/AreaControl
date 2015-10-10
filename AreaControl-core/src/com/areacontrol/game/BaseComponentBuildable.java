@@ -71,7 +71,7 @@ public class BaseComponentBuildable extends BaseComponent {
 	int     count;
 	public BaseComponentBuildable(String n,Base parent) {
 		super(n,parent);
-		
+		count = Assets.baseComponentData.get(n).getMinPerBase();
 	}
 	
 	

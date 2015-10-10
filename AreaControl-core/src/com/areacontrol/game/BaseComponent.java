@@ -181,7 +181,7 @@ public abstract class BaseComponent {
 				}
 			}
 			
-			if (Assets.baseDialog != null && Assets.baseDialog.getBase() == parent){
+			if (Assets.hasBaseDialog() && Assets.getBaseDialog().getBase() == parent){
 				if (Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
 					upDateLabel("Name", name + "(B)");
 				}
@@ -191,7 +191,7 @@ public abstract class BaseComponent {
 			}
 		}
 		
-		if (Assets.baseDialog != null && Assets.baseDialog.getBase() == parent &&
+		if (Assets.hasBaseDialog() && Assets.getBaseDialog().getBase() == parent &&
 			parent.getOwner() == Assets.playerID){
 			upDateLabel("Count","" + getCount());
 			if (Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
@@ -224,12 +224,8 @@ public abstract class BaseComponent {
 	}
 
 	public void upDateLabel(String s, String data) {
-		try {
+		if (elements.containsKey(s))
 			elements.get(s).setText(data);
-		} catch (Exception e) {
-			System.out.println("Could not Update " + s + " in Component " + name);
-		}
-		
 	}
 
 

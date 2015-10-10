@@ -68,18 +68,33 @@
 package com.areacontrol.game;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-
-public class UnitContainer {
-	ArrayList<Unit> units;
+public class UnitContainer  {
+	Map<String,ArrayList<Unit>> units;
 	Base            movingTo;
 	Base            movingFrom;
 	float           timeToArrival;
+	boolean         arrived;
 	
 	public Base getMovingFrom() {
 		return movingFrom;
 	}
 
+	public Iterable<Entry<String,ArrayList<Unit>>> getSet(){
+		return units.entrySet();
+	}
+	
+	public ArrayList<Unit> getUnits(String name){
+		try{
+			return units.get(name);
+		} catch (Exception e) {
+			System.out.println("Unit Type does not exists" + e);
+		}
+		return null;
+	}
 	public void setMovingFrom(Base movingFrom) {
 		this.movingFrom = movingFrom;
 	}
@@ -89,23 +104,31 @@ public class UnitContainer {
 	}
 
 	public void setMovingTo(Base movingTo) {
+		arrived       = false;
 		timeToArrival = 10.0f;
 		this.movingTo = movingTo;
 	}
 
 	public UnitContainer(){
-		units = new ArrayList<Unit>();
+		units = new HashMap<String,ArrayList<Unit>>();
 	}
 	
 	public void addUnits(Unit bc){
-		units.add(bc);
+		String n = bc.getName();
+		if (!units.containsKey(n))
+			units.put(n,new ArrayList<Unit>());
+		units.get(n).add(bc);		
 	}
 
 	public void update(float time) {
 		timeToArrival -= time;
 		if (timeToArrival<0){
-			System.out.println("Units arrived!");
+			arrived = true;
 		}
+	}
+
+	public boolean haveArrived() {
+		return arrived;
 	}
 
 	

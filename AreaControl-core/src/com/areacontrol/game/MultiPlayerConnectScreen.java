@@ -68,6 +68,7 @@ package com.areacontrol.game;
 
 import appwarp.WarpController;
 import appwarp.WarpListener;
+import appwarp.WarpMessage;
 
 import java.util.Random;
 
@@ -77,7 +78,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 
 public class MultiPlayerConnectScreen implements Screen, WarpListener {
@@ -190,8 +190,8 @@ public class MultiPlayerConnectScreen implements Screen, WarpListener {
 	}
 	
 	@Override
-	public void onGameUpdateReceived (String message) {
-		
+	public void onGameUpdateReceived (WarpMessage msg) {
+		System.out.println("Message Received in MP Connect");
 	}
 
 	@Override

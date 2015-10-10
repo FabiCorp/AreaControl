@@ -1,5 +1,8 @@
 package appwarp;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Hashtable;
 
@@ -9,6 +12,7 @@ import com.shephertz.app42.gaming.multiplayer.client.events.MoveEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomData;
 import com.shephertz.app42.gaming.multiplayer.client.events.UpdateEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.NotifyListener;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 public class NotificationListener implements NotifyListener{
 
@@ -32,7 +36,24 @@ public class NotificationListener implements NotifyListener{
 	}
 
 	public void onUpdatePeersReceived(UpdateEvent event) {
-		callBack.onGameUpdateReceived(new String(event.getUpdate()));
+		WarpMessage msg = null;
+		try
+		{
+			ByteArrayInputStream bIn = new ByteArrayInputStream(event.getUpdate());
+			ObjectInputStream in = new ObjectInputStream(bIn);
+			msg = (WarpMessage) in.readObject();
+			in.close();
+		}catch(IOException i)
+		{
+			i.printStackTrace();
+			return;
+		}catch(ClassNotFoundException c)
+		{
+			System.out.println("Employee class not found");
+			c.printStackTrace();
+			return;
+		}
+		callBack.onGameUpdateReceived(msg); 
 	}
 
 	public void onUserJoinedLobby(LobbyData arg0, String arg1) {

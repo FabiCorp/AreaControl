@@ -70,8 +70,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.ApplicationListener;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -81,16 +80,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
-
-import appwarp.WarpController;
-
 
 public class GameScreen implements Screen {
 
 	protected Game  game;
-	protected Stage mainScreen;
+	protected Stage stage;
 	
 	GameState       gameState;
 	ArrayList<Base> bases;
@@ -100,9 +94,9 @@ public class GameScreen implements Screen {
 	
 	public GameScreen(Game game) {
 		this.game  = game;
-		mainScreen = new Stage(); // Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),true);
+		stage = new Stage(); // Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),true);
 	    Assets.skin = new Skin(Gdx.files.internal("data/uiskin.json"));
-		Gdx.input.setInputProcessor(mainScreen);
+		Gdx.input.setInputProcessor(stage);
 
 		mapCreator();
 
@@ -115,18 +109,14 @@ public class GameScreen implements Screen {
 
 		resCount = new Label("Resources" + Assets.resources, Assets.skin);
 		resCount.setPosition(0, 300);
-		mainScreen.addActor(resCount);
+		stage.addActor(resCount);
 
-//		new Timer().scheduleTask(new Task() {	
-//			@Override
-//			public void run() {
-//				update();
-//			}
-//		},0.0f,Assets.refreshTime,10000000);
-
-		mainScreen.addListener(new InputListener(){
+		stage.addListener(new InputListener(){
 			@Override
 			public boolean keyDown(InputEvent event, int keycode) {
+				if (keycode == Assets.keyQ || keycode == Assets.keyESC) {
+					gameOver();
+				}
 				System.out.println("pressed:"+keycode);
 				return true;
 
@@ -139,6 +129,10 @@ public class GameScreen implements Screen {
 	{	
 		for (UnitContainer units : unitsMoving) {
 			units.update(time);
+			if (units.haveArrived()){
+				game.setScreen(new FightScreen(game, units, units, this));
+			}
+				
 		}
 		
 		for (Base base : bases) {
@@ -157,26 +151,26 @@ public class GameScreen implements Screen {
 		Base b1 = new Base(0,0,this);
 		if (Assets.playerID == 1)
 			b1.setOwner(Assets.playerID);
-		mainScreen.addActor(b1);
+		stage.addActor(b1);
 		bases.add(b1);
 		
 		b1 = new Base(150,150,this);
-		mainScreen.addActor(b1);
+		stage.addActor(b1);
 		bases.add(b1);
 		
 		b1 = new Base(300,0,this);
 		if (Assets.playerID == 2)
 			b1.setOwner(Assets.playerID);
-		mainScreen.addActor(b1);
+		stage.addActor(b1);
 		bases.add(b1);
 		
 		b1 = new Base(150,300,this);
-		mainScreen.addActor(b1);
+		stage.addActor(b1);
 		bases.add(b1);
 	}
     @Override
     public void dispose() {
-        mainScreen.dispose();
+        stage.dispose();
     }
 
     @Override
@@ -220,8 +214,8 @@ public class GameScreen implements Screen {
     		Gdx.gl.glClearColor(.0f, .255f, .255f, 1);	
     	}
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        mainScreen.act(Gdx.graphics.getDeltaTime());
-        mainScreen.draw();
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
 	}
 
 	@Override
@@ -231,6 +225,10 @@ public class GameScreen implements Screen {
 	}
 	
 	protected void gameOver() {
+		gameOverLocal();
+	}
+   
+	protected void gameOverLocal() {
 		game.setScreen(new MainMenuScreen(game));
 	}
    

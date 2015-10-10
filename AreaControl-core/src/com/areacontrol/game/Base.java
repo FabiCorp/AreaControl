@@ -177,8 +177,8 @@ public class Base extends Actor {
 		for (BaseComponent baseComponent : newComponents)
 			components.add(baseComponent);
 		
-		if (created && Assets.baseDialog.getBase()==this){
-			BaseDialog bd = new BaseDialog(this, Assets.skin);
+		if (created && Assets.hasBaseDialog() && Assets.getBaseDialog().getBase()==this){
+			BaseDialog bd = new BaseDialog(this);
 			Assets.registerDialog(bd);
 			getStage().addActor(bd);
 		}

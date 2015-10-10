@@ -1,6 +1,9 @@
 package appwarp;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Hashtable;
 
@@ -26,6 +29,8 @@ public class WarpController {
 	private WarpClient warpClient;
 	
 	private String localUser;
+	
+	
 	private String roomId;
 	
 	private boolean isConnected = false;
@@ -88,15 +93,7 @@ public class WarpController {
 		}
 	}
 	
-	public void sendGameUpdate(String msg){
-		if(isConnected){
-			if(isUDPEnabled){
-				warpClient.sendUDPUpdatePeers((localUser+"#@"+msg).getBytes());
-			}else{
-				warpClient.sendUpdatePeers((localUser+"#@"+msg).getBytes());
-			}
-		}
-	}
+	
 	
 	public void updateResult(int code, String msg){
 		if(isConnected){
@@ -186,13 +183,35 @@ public class WarpController {
 		log("onSendChatDone: "+status);
 	}
 	
-	public void onGameUpdateReceived(String message){
+	public void onGameUpdateReceived(WarpMessage message){
 //		log("onMoveUpdateReceived: message"+ message );
-		String userName = message.substring(0, message.indexOf("#@"));
-		String data = message.substring(message.indexOf("#@")+2, message.length());
+		String userName = message.getUserName();
 		if(!localUser.equals(userName)){
-			warpListener.onGameUpdateReceived(data);
+			warpListener.onGameUpdateReceived(message);
 		}
+	}
+	
+	public void sendGameUpdate(WarpMessage msg){
+		msg.setUserName(localUser);
+		try
+		{
+			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+			ObjectOutputStream out = new ObjectOutputStream(bOut);
+			out.writeObject(msg);
+			out.close();
+			
+			if(isConnected){
+				if(isUDPEnabled){
+					warpClient.sendUDPUpdatePeers(bOut.toByteArray());
+				}else{
+					warpClient.sendUpdatePeers(bOut.toByteArray());
+				}
+			}
+		}catch(IOException i)
+		{
+			i.printStackTrace();
+		}
+	
 	}
 	
 	public void onResultUpdateReceived(String userName, int code){
@@ -257,4 +276,9 @@ public class WarpController {
 		warpClient.removeNotificationListener(new NotificationListener(this));
 		warpClient.disconnect();
 	}
+	
+	public String getLocalUser() {
+		return localUser;
+	}
+
 }

@@ -85,7 +85,7 @@ public class MainScreenListener extends ClickListener {
 		}
 		else
 		{
-			BaseDialog bd = new BaseDialog(base,Assets.skin);
+			BaseDialog bd = new BaseDialog(base);
 			Assets.registerDialog(bd);
 			base.getStage().addActor(bd);
 		}

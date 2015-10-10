@@ -70,6 +70,7 @@ import org.json.JSONObject;
 
 import appwarp.WarpController;
 import appwarp.WarpListener;
+import appwarp.WarpMessage;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -88,36 +89,20 @@ public class MultiplayerGameScreen extends GameScreen implements Screen, WarpLis
 		WarpController.getInstance().setListener(this);
 	}
 	
-	@Override
-	protected void clickedButton(){
-		sendLocation(0, 0, 0, 0);
-	}
-	
-	private void sendLocation(float x, float y, float width, float height){
 		
-		try {
-			JSONObject data = new JSONObject();
-			data.put("x", x);
-			data.put("y", y);
-			data.put("width", width);
-			data.put("height", height);
-			WarpController.getInstance().sendGameUpdate(data.toString());
-			
-		} catch (Exception e) {
-			// exception in sendLocation
-		}
+	public void sendMessage(WarpMessage msg) {
+		WarpController.getInstance().sendGameUpdate(msg);
 	}
+
 	
 	@Override
 	protected void gameOver() {
-		if (Gdx.input.justTouched()) {
-			WarpController.getInstance().handleLeave();
-			game.setScreen(new MainMenuScreen(game));
-		}
-	}
-
-	private void handleLeaveGame(){
+		System.out.println("Local User: " + WarpController.getInstance().getLocalUser() + "terminating");
+		ACStringMessage msg = new ACStringMessage("GameOver");
+		sendMessage(msg);
 		WarpController.getInstance().handleLeave();
+		gameOverLocal();
+		
 	}
 
 	@Override
@@ -136,7 +121,6 @@ public class MultiplayerGameScreen extends GameScreen implements Screen, WarpLis
 	@Override
 	public void onGameFinished (int code, boolean isRemote) {
 		if(isRemote){
-			//prevScreen.onGameFinished(code, true);
 			System.out.println("Detected Remote");
 		}else{
 			if(code==WarpController.GAME_WIN){
@@ -148,23 +132,20 @@ public class MultiplayerGameScreen extends GameScreen implements Screen, WarpLis
 			}
 		}
 		WarpController.getInstance().handleLeave();
+		gameOverLocal();
 	}
 
 	@Override
-	public void onGameUpdateReceived (String message) {
-		try {
-			JSONObject data = new JSONObject(message);
-			float x = (float)data.getDouble("x");
-			float y = (float)data.getDouble("y");
-			float width = (float)data.getDouble("width");
-			float height = (float)data.getDouble("height");
-			//System.out.println("Received Data");
-			//Assets.clicksByOther++;
-			//msg.setText("Player:  " + Assets.playerID + " Clicked: " + Assets.clicksByOther);
-			
-			//renderer.updateEnemyLocation(x, y, width, height);
-		} catch (Exception e) {
-			// exception in onMoveNotificationReceived
+	public void onGameUpdateReceived (WarpMessage message) {
+		
+		if (message instanceof ACStringMessage) {
+			ACStringMessage msg = (ACStringMessage) message;
+			System.out.println("Message Received" + msg.getString());
+			if (msg.getString() == "GameOver") {
+				System.out.println("Local User: " + WarpController.getInstance().getLocalUser() + "terminating");
+				WarpController.getInstance().stopApp();
+				
+			}
 		}
 	}
 }

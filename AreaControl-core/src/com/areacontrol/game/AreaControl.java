@@ -1,12 +1,15 @@
 package com.areacontrol.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class AreaControl extends Game {
 	@Override
 	public void create () {
-		setScreen(new MainMenuScreen(this));
+            Assets.skin = new Skin(Gdx.files.internal("data/uiskin.json"));
+            setScreen(new MainMenuScreen(this));
 	}
 	
 	@Override
