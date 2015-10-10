@@ -28,7 +28,6 @@ public class FightScreen implements Screen {
 		timeSinceUpdate = 0;
 		
 		stage    = new Stage(); // Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),true);
-	  
 		Gdx.input.setInputProcessor(stage);
 		
 

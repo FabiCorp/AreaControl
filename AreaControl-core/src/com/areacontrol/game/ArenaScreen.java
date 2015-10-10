@@ -9,6 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 
 public class ArenaScreen implements Screen {
@@ -18,6 +21,7 @@ public class ArenaScreen implements Screen {
 	
 	public ArenaScreen(Game game) {
 		this.game  = game;
+		
 		stage = new Stage(); // Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),true);
 	    Assets.skin = new Skin(Gdx.files.internal("data/uiskin.json"));
 		Gdx.input.setInputProcessor(stage);
@@ -32,7 +36,22 @@ public class ArenaScreen implements Screen {
 			uc2.addUnits(new Unit("Marine"));
 		uc2.addUnits(new Unit("Tank"));
 		
-		game.setScreen(new FightScreen(game, uc1, uc2, this));
+		TextButton button;
+		float ypos        =  0.75f*Gdx.graphics.getHeight();
+		final Game myGame = this.game;
+		button = new TextButton("Start",Assets.skin);
+		button.setPosition(Gdx.graphics.getWidth()/2,ypos, Align.center);
+		button.addListener(new ClickListener(){
+            @Override
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            	System.out.println("Starting Fight");
+            	// myGame.setScreen(new FightScreen(myGame, uc1, uc2, this));
+				return true;
+			}
+		});
+		stage.addActor(button);
+		ypos -= 2*button.getHeight();
+	
 		
 	}
 	
@@ -44,8 +63,10 @@ public class ArenaScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		// TODO Auto-generated method stub
-		
+		Gdx.gl.glClearColor(.0f, .255f, .255f, 1);	
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw(); 
 	}
 
 	@Override
