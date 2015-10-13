@@ -66,7 +66,7 @@
  */
 package com.areacontrol.game;
 
-public class GameStateSendUnits extends GameState {
+public class GameStateSendUnits extends GameState  {
 
 	
 	UnitContainer units;
@@ -76,14 +76,9 @@ public class GameStateSendUnits extends GameState {
 		this.units = units; 
 	}
 	
-	public Base getFrom() {
-		return units.getMovingFrom();
-	}
-	
-	public void sendUnitsTo(Base to){
+	public UnitContainer sendTo(Base to){
 		units.setMovingTo(to);
-		getFrom().getGame().register(units);
-		getFrom().getGame().setGameState(new GameStateBuilding());
+		return units;
 	}
 	
 }

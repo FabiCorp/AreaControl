@@ -80,12 +80,12 @@ import com.badlogic.gdx.utils.Align;
 public class MainMenuScreen implements Screen {
 
 	final Game  game;
-	Stage mainScreen;
+	final Stage stage;
 	
 	public MainMenuScreen(Game game){
 		this.game = game;
-		mainScreen = new Stage();
-		Gdx.input.setInputProcessor(mainScreen);
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
 		
 		TextButton button;
 		float ypos        =  0.75f*Gdx.graphics.getHeight();
@@ -99,7 +99,7 @@ public class MainMenuScreen implements Screen {
 				return true;
 			}
 		});
-		mainScreen.addActor(button);
+		stage.addActor(button);
 		ypos -= 2*button.getHeight();
 		
 		button = new TextButton("Arena",Assets.skin);
@@ -111,7 +111,7 @@ public class MainMenuScreen implements Screen {
 				return true;
 			}
 		});
-		mainScreen.addActor(button);
+		stage.addActor(button);
 		ypos -= 2*button.getHeight();
 		
 		button = new TextButton("Multiplayer",Assets.skin);
@@ -123,7 +123,7 @@ public class MainMenuScreen implements Screen {
 				return true;
 			}
 		});
-		mainScreen.addActor(button);
+		stage.addActor(button);
 		ypos -= 2*button.getHeight();
 		
 		
@@ -136,7 +136,7 @@ public class MainMenuScreen implements Screen {
 				return true;
 			}
 		});
-		mainScreen.addActor(button);
+		stage.addActor(button);
 	}
 	
 	@Override
@@ -149,8 +149,8 @@ public class MainMenuScreen implements Screen {
 		// TODO Auto-generated method stub
 		Gdx.gl.glClearColor(.0f, .255f, .255f, 1);	
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        mainScreen.act(Gdx.graphics.getDeltaTime());
-        mainScreen.draw(); 
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw(); 
 	}
 
 	@Override

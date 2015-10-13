@@ -30,15 +30,15 @@ public class ArenaScreen implements Screen {
 		uc2 = new UnitContainer();
 		
 		for (int i = 0; i < 5; i++)
-			uc1.addUnits(new Unit("Marine"));
+			uc1.addUnits(new Unit("Marine",1));
 		
 		for (int i = 0; i < 2; i++)
-			uc2.addUnits(new Unit("Marine"));
-		uc2.addUnits(new Unit("Tank"));
+			uc2.addUnits(new Unit("Marine",2));
+		uc2.addUnits(new Unit("Tank",2));
 		
 		TextButton button;
 		float ypos        =  0.75f*Gdx.graphics.getHeight();
-		final Game myGame = this.game;
+	
 		button = new TextButton("Start",Assets.skin);
 		button.setPosition(Gdx.graphics.getWidth()/2,ypos, Align.center);
 		button.addListener(new ClickListener(){
@@ -58,13 +58,14 @@ public class ArenaScreen implements Screen {
 	}
 	
 	private void startFight() {
-		// TODO Auto-generated method stub
 		game.setScreen(new FightScreen(game, uc1, uc2, this));	
 	}
+	
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		
+		System.out.println("AreneScreen Show Called");
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override

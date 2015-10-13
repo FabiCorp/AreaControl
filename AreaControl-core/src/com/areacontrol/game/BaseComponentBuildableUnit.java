@@ -91,7 +91,6 @@ public class BaseComponentBuildableUnit extends BaseComponent {
 	}
 	
 	public Unit removeUnit() {
-		// TODO Auto-generated method stub
 		
 		try
 		{
@@ -104,10 +103,10 @@ public class BaseComponentBuildableUnit extends BaseComponent {
 
 	@Override
 	protected void makeNewElement() {
-		// TODO Auto-generated method stub
-		units.add(new Unit(name));
+		units.add(new Unit(name,parent.getOwner()));
 	}
 
+	
 	@Override
 	public void moveUnit() {
 		if (units.size()>0){

@@ -68,8 +68,8 @@ package com.areacontrol.game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -90,7 +90,7 @@ public class GameScreen implements Screen {
 	ArrayList<Base> bases;
 	
 	Label           resCount;
-	private ArrayList<UnitContainer> unitsMoving;
+	protected       ArrayList<UnitContainer> unitsMoving;
 	
 	public GameScreen(Game game) {
 		this.game  = game;
@@ -102,13 +102,16 @@ public class GameScreen implements Screen {
 
 		unitsMoving = new ArrayList<UnitContainer>();
 
-		Assets.resources = 10000;
+		Assets.gameInfo.setResources(10000);
 
 		Map<String,Float> buildTime = new HashMap<String,Float>();
 		buildTime.put("Worker",10.0f);
 
-		resCount = new Label("Resources" + Assets.resources, Assets.skin);
-		resCount.setPosition(0, 300);
+		Label player = new Label("Player: " + Assets.gameInfo.getPlayerID(),Assets.skin);
+		player.setPosition(0, 400);
+		stage.addActor(player);
+		resCount = new Label("Resources" + Assets.gameInfo.getResources(), Assets.skin);
+		resCount.setPosition(0, 380);
 		stage.addActor(resCount);
 
 		stage.addListener(new InputListener(){
@@ -125,23 +128,36 @@ public class GameScreen implements Screen {
 
 	}
 	
+	public void checkUnitsArrived() {
+		// single player version
+		Iterator<UnitContainer> iter = unitsMoving.iterator();
+		while (iter.hasNext()) {
+			UnitContainer units = iter.next();
+			if (units.haveArrived()){
+				Base defBase           = findBase(units.getTagetBaseID());
+				UnitContainer defender = defBase.getUnits();
+				iter.remove();
+				game.setScreen(new FightScreen(game, units, defender, this));
+			}	
+		}
+	}
+	
 	public void update(float time)
 	{	
 		for (UnitContainer units : unitsMoving) {
 			units.update(time);
-			if (units.haveArrived()){
-				game.setScreen(new FightScreen(game, units, units, this));
-			}
-				
 		}
 		
+		checkUnitsArrived(); 
+		
 		for (Base base : bases) {
-			if (base.getOwner()==Assets.playerID) {
-				Assets.resources +=  base.getWorkers() * Assets.resourceRatePerWorker*time;
+			if (base.isOwnedByPlayer()) {
+				Assets.gameInfo.addResources(base.getWorkers() * Assets.resourceRatePerWorker*time);
 			}
 			base.update(time);
 		}
-		resCount.setText("Resources: " + (int) Assets.resources);
+		
+		resCount.setText("Resources: " + (int) Assets.gameInfo.getResources());
 	}
 	
 	public void mapCreator()
@@ -149,8 +165,8 @@ public class GameScreen implements Screen {
 		bases = new ArrayList<Base>();
 		
 		Base b1 = new Base(0,0,this);
-		if (Assets.playerID == 1)
-			b1.setOwner(Assets.playerID);
+		if (Assets.gameInfo.getPlayerID() == 1)
+			b1.setOwner(Assets.gameInfo.getPlayerID());
 		stage.addActor(b1);
 		bases.add(b1);
 		
@@ -159,8 +175,8 @@ public class GameScreen implements Screen {
 		bases.add(b1);
 		
 		b1 = new Base(300,0,this);
-		if (Assets.playerID == 2)
-			b1.setOwner(Assets.playerID);
+		if (Assets.gameInfo.getPlayerID() == 2)
+			b1.setOwner(Assets.gameInfo.getPlayerID());
 		stage.addActor(b1);
 		bases.add(b1);
 		
@@ -168,6 +184,7 @@ public class GameScreen implements Screen {
 		stage.addActor(b1);
 		bases.add(b1);
 	}
+	
     @Override
     public void dispose() {
         stage.dispose();
@@ -183,6 +200,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resume() {
+    	Gdx.input.setInputProcessor(stage);
     }
 
 	public void setGameState(GameState gameState) {
@@ -199,13 +217,11 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-		
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void render(float delta) {
-		// TODO Auto-generated method stub
 		update(delta);
 		if (gameState instanceof GameStateSendUnits){
     		Gdx.gl.glClearColor(.35f, .206f, .235f, 1);
@@ -232,8 +248,14 @@ public class GameScreen implements Screen {
 		game.setScreen(new MainMenuScreen(game));
 	}
    
-	protected void clickedButton(){
-		// sendLocation(0, 0, 0, 0);
+	
+	protected Base findBase(int targetBaseID) {
+		for (Base base : bases) {
+			if (base.getID() == targetBaseID){
+				return base;
+			}
+		}
+		throw new IllegalArgumentException();
 	}
 	
 }

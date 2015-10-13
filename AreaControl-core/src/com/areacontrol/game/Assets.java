@@ -1,20 +1,15 @@
 package com.areacontrol.game;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-import appwarp.WarpController;
-import appwarp.WarpMessage;
 
 public class Assets {
+	
+
 	public static Skin skin;
 	
 	public static int   keyP   = 44;
@@ -27,8 +22,8 @@ public class Assets {
 	//public static float refreshTime = 0.1f;
 	
 	private static BaseDialog baseDialog = null;
-	public static int playerID  = 1;
-	public static float resources = 0f;
+	public static  GameInfoData gameInfo = new GameInfoData();
+	
 	public static float resourceRatePerWorker = 10.0f; 
 	public static Map<String,BaseComponentData> baseComponentData;
 
@@ -90,4 +85,6 @@ public class Assets {
 	}
 	
 	public static Random randGen = new Random();
+
+	public static int BaseCount = 0;
 }

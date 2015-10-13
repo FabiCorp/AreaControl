@@ -17,5 +17,7 @@ public abstract class WarpMessage implements Serializable {
 		this.userName = userName;
 	}
 	
-	
+	public void broadcast(){
+		WarpController.getInstance().sendGameUpdate(this);
+	}
 }

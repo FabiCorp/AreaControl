@@ -157,7 +157,7 @@ public class WarpController {
 		
 		if(liveUsers!=null){
 			log("onGetLiveRoomInfo: "+liveUsers.length);
-			Assets.playerID = liveUsers.length;
+			Assets.gameInfo.setPlayerID(liveUsers.length);
 			if(liveUsers.length==2){
 				startGame();	
 			}else{

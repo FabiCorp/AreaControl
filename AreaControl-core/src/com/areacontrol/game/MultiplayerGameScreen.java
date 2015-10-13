@@ -66,11 +66,21 @@
  */
 package com.areacontrol.game;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.json.JSONObject;
 
 import appwarp.WarpController;
 import appwarp.WarpListener;
 import appwarp.WarpMessage;
+import javafx.scene.Scene;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -84,22 +94,49 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class MultiplayerGameScreen extends GameScreen implements Screen, WarpListener {
 
+	UnitContainer attacker;
+	UnitContainer defender;
+	boolean       startFight;
 	public MultiplayerGameScreen (Game game) {
 		super(game);
 		WarpController.getInstance().setListener(this);
+		startFight = false;
 	}
 	
-		
-	public void sendMessage(WarpMessage msg) {
-		WarpController.getInstance().sendGameUpdate(msg);
+	@Override
+	public void checkUnitsArrived() {
+		// multiplayer Version
+		for (UnitContainer units : unitsMoving) {
+			if (units.haveArrived()){
+				attacker = units;
+				System.out.println("Player" + Assets.gameInfo.getPlayerID()+"sends message");
+				ACUnitContainerMessage message = new ACUnitContainerMessage(units);
+				units.setArrivedFalse();
+				message.broadcast();
+			}	
+		}	
 	}
-
+	
+	@Override
+	public void update(float time) {
+		super.update(time);
+		
+		
+		if (startFight) {
+			Label l = new Label("Ready to Fight",Assets.skin);
+			l.setPosition(200, 200);
+			stage.addActor(l);
+			game.setScreen(new FightScreen(game, attacker, defender, this));
+		}	
+		
+		
+	};
 	
 	@Override
 	protected void gameOver() {
 		System.out.println("Local User: " + WarpController.getInstance().getLocalUser() + "terminating");
 		ACStringMessage msg = new ACStringMessage("GameOver");
-		sendMessage(msg);
+		msg.broadcast();
 		WarpController.getInstance().handleLeave();
 		gameOverLocal();
 		
@@ -143,9 +180,46 @@ public class MultiplayerGameScreen extends GameScreen implements Screen, WarpLis
 			System.out.println("Message Received" + msg.getString());
 			if (msg.getString() == "GameOver") {
 				System.out.println("Local User: " + WarpController.getInstance().getLocalUser() + "terminating");
-				WarpController.getInstance().stopApp();
+				//WarpController.getInstance().stopApp();
 				
 			}
 		}
+		else if (message instanceof ACUnitContainerMessage){
+			// we are being attacked !
+			ACUnitContainerMessage msg = (ACUnitContainerMessage) message;
+			attacker = msg.getUnits();
+			System.out.println("Player: " + Assets.gameInfo.getPlayerID() + " received UnitContainer");
+			for(Map.Entry<String,ArrayList<Unit>> e : attacker.getSet()){
+				for (Unit u: e.getValue()){
+					System.out.println("Unit:"+u.getName());
+				}
+			}
+			Base defBase  = findBase(attacker.getTagetBaseID());
+			defender = defBase.getUnits();
+			System.out.println("Player: " + Assets.gameInfo.getPlayerID() + " Defenders UnitContainer");
+			for(Map.Entry<String,ArrayList<Unit>> e : defender.getSet()){
+				for (Unit u: e.getValue()){
+					System.out.println("Unit:"+u.getName());
+				}
+			}
+
+			ACUnitContainerBaseMessage msg2 = new ACUnitContainerBaseMessage(defender);
+			msg2.broadcast();
+			startFight = true;
+		} else if (message instanceof ACUnitContainerBaseMessage){
+			// we are the attacker receiving the defending units !
+			// attacker must be set in the update loop
+			ACUnitContainerBaseMessage msg = (ACUnitContainerBaseMessage) message;
+			defender = msg.getUnits();
+			System.out.println("Player: " + Assets.gameInfo.getPlayerID() + " received UnitContainer");
+			for(Map.Entry<String,ArrayList<Unit>> e : defender.getSet()){
+				for (Unit u: e.getValue()){
+					System.out.println("Unit:"+u.getName());
+				}
+			}
+			startFight = true;
+		}
 	}
 }
+
+

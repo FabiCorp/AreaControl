@@ -49,7 +49,7 @@ public class NotificationListener implements NotifyListener{
 			return;
 		}catch(ClassNotFoundException c)
 		{
-			System.out.println("Employee class not found");
+			System.out.println("WarpMessage class not found");
 			c.printStackTrace();
 			return;
 		}
@@ -69,6 +69,7 @@ public class NotificationListener implements NotifyListener{
 	}
 
 	public void onUserLeftRoom(RoomData roomData, String userName) {
+		System.out.println("User: " + userName + " left room!");
 		callBack.onUserLeftRoom(roomData.getId(), userName);
 	}
 

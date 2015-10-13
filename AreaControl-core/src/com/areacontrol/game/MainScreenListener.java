@@ -81,7 +81,10 @@ public class MainScreenListener extends ClickListener {
 		
 		if (game.getGameState() instanceof GameStateSendUnits)
 		{
-			((GameStateSendUnits) game.getGameState()).sendUnitsTo(base);
+			GameStateSendUnits gs = (GameStateSendUnits) game.getGameState();
+			UnitContainer units = gs.sendTo(base);
+			game.register(units);
+			game.setGameState(new GameStateBuilding());
 		}
 		else
 		{

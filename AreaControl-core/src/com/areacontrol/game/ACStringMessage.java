@@ -4,9 +4,6 @@ import appwarp.WarpMessage;
 
 public class ACStringMessage extends WarpMessage {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	String s;
 	

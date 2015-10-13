@@ -66,6 +66,7 @@
  */
 package com.areacontrol.game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
@@ -73,15 +74,18 @@ import java.util.Random;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
-public class Unit {
+public class Unit extends UniqeUnitID implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String name;
 	float  health;
-	Actor  actor;
 	
-	public Unit(String name) {
+	public Unit(String name, int playerID) {
+		super(playerID);
 		this.name   = name;
 		this.health = 100;
-		this.actor = null;
 	}
 	
 	public String getName() {
@@ -95,37 +99,66 @@ public class Unit {
 		return name.substring(0,1)+hh;
 	}
 	
-	public void registerActor(Actor a){
-		this.actor = a;
+	public String getId(){
+		return getName()+playerID + "."+unitID;
 	}
-
 	public void attack(Unit u){
+		System.out.println("Unit: " + getId() + " attacks " + u.getId() + " H:"  + (int) u.health);
 		float damage = Assets.randGen.nextFloat()*10; // take some shot
 		u.receiveDamage(damage);
 	}
 
-	private void receiveDamage(float damage) {
-		// TODO Auto-generated method stub
+	private void receiveDamage(float damage) {	
 		health -= damage;
-		if (actor != null){
-			((Label) actor).setText(generateSymbol());
-		}
 	}
 
 	public void attack(UnitContainer uc2) {
-		// ich bin: this.getName()!
-		
+		// This unit: this.getName() will pick some other unit to attack
+
 		if (getName() == "Marine"){
 			// are there other marines left ? 
 			ArrayList<Unit> marines = uc2.getUnits("Marine");
 			// if yes: attack random marine 
-			if (marines.size()>0){
+			if (marines!= null && marines.size()>0){
 				int i = Assets.randGen.nextInt(marines.size());
 				attack(marines.get(i));	
 			}
-			
-		
-			
+			else {
+				for(Map.Entry<String,ArrayList<Unit>> e : uc2.getSet()){
+					if (e.getKey() != "Marine"){
+						if (e.getValue().size()>0){
+							int i = Assets.randGen.nextInt(e.getValue().size());
+							attack(e.getValue().get(i));
+							break; // found someone to attack
+						}
+					}
+				}
+			}
+		} else if (getName()=="Tank") {
+			// if marines are left, attack 3 of them
+			ArrayList<Unit> marines = uc2.getUnits("Marine");
+			// if yes: attack random marine 
+			if (marines!=null && marines.size()>0){
+				for(int k=0;k<3;k++){
+					int i = Assets.randGen.nextInt(marines.size());
+					attack(marines.get(i));						
+				}
+			}
 		}
+	}
+
+	public void makeSprite(Actor actor) {
+		try {
+			Label l = (Label) actor;
+			l.setText(generateSymbol());
+		} catch (Exception e) {
+			System.out.println("FightScreen cannot update Actor for Unit");
+		}
+		
+		
+	}
+
+	public boolean isAlive() {
+		return health>0;
 	}
 }

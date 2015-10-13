@@ -67,21 +67,29 @@
 
 package com.areacontrol.game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class UnitContainer  {
-	Map<String,ArrayList<Unit>> units;
-	Base            movingTo;
-	Base            movingFrom;
-	float           timeToArrival;
-	boolean         arrived;
+public class UnitContainer implements Serializable {
 	
-	public Base getMovingFrom() {
-		return movingFrom;
+	private static final long serialVersionUID = 1L;
+	
+	private int             playerId;
+	private Map<String,ArrayList<Unit>> units;
+	private int             baseMovingToId;
+	private float           timeToArrival;
+	UnitTransportState      transportState;
+	private int             baseReturnId;
+	
+	public UnitContainer(){
+		this.playerId = Assets.gameInfo.getPlayerID();
+		units = new HashMap<String,ArrayList<Unit>>();
+		transportState = UnitTransportState.UnitsNotSent;
 	}
+
 
 	public Iterable<Entry<String,ArrayList<Unit>>> getSet(){
 		return units.entrySet();
@@ -95,22 +103,17 @@ public class UnitContainer  {
 		}
 		return null;
 	}
-	public void setMovingFrom(Base movingFrom) {
-		this.movingFrom = movingFrom;
-	}
-
-	public Base getMovingTo() {
-		return movingTo;
-	}
-
+	
 	public void setMovingTo(Base movingTo) {
-		arrived       = false;
-		timeToArrival = 10.0f;
-		this.movingTo = movingTo;
+		if (transportState == UnitTransportState.UnitsNotSent)
+			transportState = UnitTransportState.UnitsMoving; 
+		else throw new IllegalStateException("Cannot send these units");
+		timeToArrival = 5.0f;
+		this.baseMovingToId = movingTo.getID();
 	}
 
-	public UnitContainer(){
-		units = new HashMap<String,ArrayList<Unit>>();
+	public void setMovingFrom(Base base) {
+		this.baseReturnId = base.getID();
 	}
 	
 	public void addUnits(Unit bc){
@@ -121,15 +124,28 @@ public class UnitContainer  {
 	}
 
 	public void update(float time) {
-		timeToArrival -= time;
-		if (timeToArrival<0){
-			arrived = true;
+		if (transportState == UnitTransportState.UnitsMoving) {
+			timeToArrival -= time;
+			if (timeToArrival<0){
+				transportState= UnitTransportState.UnitsArrived;
+			}
 		}
 	}
 
 	public boolean haveArrived() {
-		return arrived;
+		return transportState==UnitTransportState.UnitsArrived;
 	}
+
+	public int getTagetBaseID() {
+		return baseMovingToId;
+	}
+
+
+	public void setArrivedFalse() {
+		transportState=UnitTransportState.UnitsFighting;
+	}
+
+
 
 	
 }

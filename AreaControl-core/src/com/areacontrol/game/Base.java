@@ -68,31 +68,41 @@ package com.areacontrol.game;
 
 import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 
 
 public class Base extends Actor {
-	private Texture texture = new Texture(Gdx.files.internal("BaseIcon.png"));
-	private float baseX = 0, baseY = 0;
-	//public boolean started = false;
-	private int owner;
-	private GameScreen game;
+	
+	private Texture texture;
+	
+	private float baseX = 0; 
+	private float baseY = 0;
+	private int   ID;
+	private int                      owner;
+	private GameScreen               game;
 	
 	private ArrayList<BaseComponent> components;
+	Sprite  sprite;
 	
-	public ArrayList<BaseComponent> getComponents() {
-		return components;
-	}
+	
 	public Base(int x,int y,GameScreen game){
 		this.game = game;
-		baseX = x;
-		baseY = y;
-		owner = 0;
+		baseX     = x;
+		baseY     = y;
+		owner     = 0;
+		ID        = Assets.BaseCount++;
 					
+		texture   = new Texture(Gdx.files.internal("BaseIcon.png"));
+		sprite    = new Sprite(texture);
+		sprite.setBounds(baseX,baseY, 60, 60);
+	
 		components = new ArrayList<BaseComponent>();
+		
 		components.add(new BaseComponentBuildable("Worker",this));
 		components.add(new BaseComponentBuildable("Barracks",this));
 		components.add(new BaseComponentBuildable("Research",this));
@@ -105,7 +115,11 @@ public class Base extends Actor {
 	
 	@Override
 	public void draw(Batch batch, float alpha){
-		batch.draw(texture,baseX,baseY,100,100);
+		
+//			batch.draw(texture,baseX,baseY,100,100);
+		//batch.begin();
+		sprite.draw(batch);
+		//batch.end();
 	}
 
 	public void takeAction(String string) {
@@ -121,6 +135,11 @@ public class Base extends Actor {
 
 	public void setOwner(int owner) {
 		this.owner = owner;
+		if (isOwnedByPlayer())
+			sprite.setColor(Color.GREEN);
+		else if (this.owner != 0)
+			sprite.setColor(Color.RED);	
+		
 	}
 
 	public int getWorkers() {
@@ -157,9 +176,6 @@ public class Base extends Actor {
 			for (String newElement : enables) {
 				BaseComponent b = hasComponent(baseComponent.getName());	
 				if (b != null && b.getCount()>0 && hasComponent(newElement)==null) {
-					//System.out.println("Finished " + baseComponent.getName() + " making: " + newElement);
-					
-					
 					if (Assets.baseComponentData.get(newElement).isUnit()){
 						BaseComponentBuildableUnit n1 = new BaseComponentBuildableUnit(newElement,this);
 						newComponents.add(n1);
@@ -185,7 +201,6 @@ public class Base extends Actor {
 	}
 	
 	public void moveUnitToSend(String name) {
-		// TODO Auto-generated method stub
 		BaseComponentBuildableUnit from = null;
 		BaseComponentUnit to   = null;
 		
@@ -212,7 +227,6 @@ public class Base extends Actor {
 		}
 	}
 	public void moveUnitFromSend(String name) {
-		// TODO Auto-generated method stub
 		BaseComponentUnit from          = null;
 		BaseComponentBuildableUnit to   = null;
 		
@@ -233,11 +247,10 @@ public class Base extends Actor {
 		if (from != null && to != null && from.getCount()>0){
 			Unit u = from.removeUnit();
 			to.addUnit(u);
-			System.out.println("Moving one " + name + " back to barracks");
 		}
 	}
+	
 	public void sendUnits() {
-		// TODO Auto-generated method stub
 		UnitContainer unitsToSend = new UnitContainer();
 		for (BaseComponent baseComponent : components) {
 			if (baseComponent instanceof BaseComponentUnit){
@@ -249,12 +262,44 @@ public class Base extends Actor {
 	}
 	
 	public void addComponent(BaseComponentUnit unitStore) {
-		// TODO Auto-generated method stub
 		components.add(unitStore);
 	}
 	public GameScreen getGame() {
 		return game;
 	}
 	
+	public ArrayList<BaseComponent> getComponents() {
+		return components;
+	}
+
+	public int getID() {
+		return ID;
+	}
+
+	public UnitContainer getUnits() {
+        UnitContainer units = new UnitContainer();
+        for (BaseComponent bc: components){
+        	if (Assets.baseComponentData.get(bc.getName()).isUnit()) {
+        		if (bc instanceof BaseComponentBuildableUnit){
+        			BaseComponentBuildableUnit bcu = (BaseComponentBuildableUnit) bc;
+        			while(bcu.getCount()>0){
+        				units.addUnits(bcu.removeUnit());
+        			}        			
+        		}
+        		else if (bc instanceof BaseComponentUnit){
+        			BaseComponentUnit bcu = (BaseComponentUnit) bc;
+        			while(bcu.getCount()>0){
+        				units.addUnits(bcu.removeUnit());
+        			}        			
+        		} else {
+        			throw new IllegalArgumentException("Wrong Type" + bc.getName());        		}
+        	}
+        }
+		return units;
+	}
+
+	public boolean isOwnedByPlayer() {
+		return getOwner() == Assets.gameInfo.getPlayerID();
+	}
 	
 }

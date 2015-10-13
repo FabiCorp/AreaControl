@@ -1,7 +1,7 @@
 /*
  * Copyright & License
  * 
- * Copyright by Wolfgang Wenzel
+ * Copyright by Fabian and Wolfgang Wenzel
  * 
  * LICENSE
  * 
@@ -62,6 +62,7 @@
  * LICENSE FEE. All individuals or organizations wishing to license this
  * software shall contact: wenzel.int@gmail.com and request a quote for
  *  a license.
+ *  
  *  This license explicitly does not cover the external and linked software.
  */
 
@@ -101,14 +102,11 @@ public abstract class BaseComponent {
 	public void makeDialog(BaseDialog baseDialog) {
 		String label = getName();
 		
-		if (Assets.playerID  == parent.getOwner() && 
-			Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
+		if (parent.isOwnedByPlayer() && canBuild()){
 			label += "(B)";
 		}
 		
-		
-		if (parent.getOwner() == Assets.playerID){
-			
+		if (parent.isOwnedByPlayer()){
 			TextButton item = new TextButton(label,baseDialog.getSkin());
 			item.addListener(new ClickListener() {		
 				@Override
@@ -129,7 +127,7 @@ public abstract class BaseComponent {
 		final Label  rlabel = new Label(" "+(int) timeLeft, baseDialog.getSkin());
 		final Label  qlabel = new Label(" "+queued, baseDialog.getSkin());
 		
-		if (Assets.baseComponentData.get(name).isUnit()){
+		if (Assets.baseComponentData.get(name).isUnit() && parent.isOwnedByPlayer()){
 			TextButton clabel = new TextButton(" "+getCount(), baseDialog.getSkin());
 			baseDialog.add(clabel);
 			register("Count", clabel.getLabel());
@@ -154,9 +152,12 @@ public abstract class BaseComponent {
 		baseDialog.row();
 	}
 	
+	public boolean canBuild() {
+		return Assets.gameInfo.getResources() > Assets.baseComponentData.get(name).getResourceCost();
+	}
 	public void initiateBuild() {
-		if (Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
-			Assets.resources -= Assets.baseComponentData.get(name).getResourceCost();
+		if (canBuild()){
+			Assets.gameInfo.addResources(-Assets.baseComponentData.get(name).getResourceCost());
 			if (inProgress)
 				queued += 1;
 			else {
@@ -168,6 +169,7 @@ public abstract class BaseComponent {
 	}
 	
 	public void update(float time) {
+		// check buildings 
 		if (inProgress){
 			timeLeft -= time;
 			if (timeLeft<0){
@@ -182,7 +184,7 @@ public abstract class BaseComponent {
 			}
 			
 			if (Assets.hasBaseDialog() && Assets.getBaseDialog().getBase() == parent){
-				if (Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
+				if (canBuild()){
 					upDateLabel("Name", name + "(B)");
 				}
 				upDateLabel("Time", "" + (int) timeLeft);
@@ -192,9 +194,9 @@ public abstract class BaseComponent {
 		}
 		
 		if (Assets.hasBaseDialog() && Assets.getBaseDialog().getBase() == parent &&
-			parent.getOwner() == Assets.playerID){
+			parent.isOwnedByPlayer()){
 			upDateLabel("Count","" + getCount());
-			if (Assets.resources > Assets.baseComponentData.get(name).getResourceCost()){
+			if (canBuild()){
 				upDateLabel("Name", name + "(B)");
 			}
 			else
@@ -227,6 +229,8 @@ public abstract class BaseComponent {
 		if (elements.containsKey(s))
 			elements.get(s).setText(data);
 	}
+
+	
 
 
 }

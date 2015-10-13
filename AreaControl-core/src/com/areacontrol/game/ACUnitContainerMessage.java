@@ -1,7 +1,7 @@
 /*
  * Copyright & License
  * 
- * Copyright by Wolfgang Wenzel
+ * Copyright by Fabian and Wolfgang Wenzel
  * 
  * LICENSE
  * 
@@ -62,82 +62,28 @@
  * LICENSE FEE. All individuals or organizations wishing to license this
  * software shall contact: wenzel.int@gmail.com and request a quote for
  *  a license.
+ *  
  *  This license explicitly does not cover the external and linked software.
  */
 package com.areacontrol.game;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import appwarp.WarpMessage;
 
+/**
+ * @author Wolfgang Wenzel
+ *
+ */
+public class ACUnitContainerMessage extends WarpMessage {
 
-public class BaseDialog extends Table {
-
-	final   Base parent;
+	private UnitContainer units;
 	
-	public BaseDialog(final Base base) {
-		super(Assets.skin);
-		this.parent = base;
-		
-		setPosition(500, 300);
+	private static final long serialVersionUID = 1L;
 
-		add(new Label("Player:"+base.getOwner(),Assets.skin));
-		row();
-		// Buildings
-		for (BaseComponent bc : base.getComponents()) {
-			if (bc instanceof BaseComponentBuildable){
-				bc.makeDialog(this);
-			}
-		}
-		// Units 
-		for (BaseComponent bc : base.getComponents()) {
-			if (bc instanceof BaseComponentBuildableUnit ){
-				bc.makeDialog(this);
-			}
-		}
-		
-		if (parent.isOwnedByPlayer()){			
-			TextButton sendButton = new TextButton("Units To Send", Assets.skin);
-			sendButton.addListener(new ClickListener() {		
-				@Override
-				public void clicked(InputEvent event, float x, float y) {
-					parent.sendUnits();
-				}
-			});
-			
-			add(sendButton);
-		}
-		else {
-			Label sendButton = new Label("Units To Send", Assets.skin);
-			add(sendButton);
-		}
-		row();
-		for (BaseComponent bc : base.getComponents()) {
-			if (bc instanceof BaseComponentUnit){
-				bc.makeDialog(this);
-			}
-		}	
-	
-
-		
-		
+	public ACUnitContainerMessage(UnitContainer units) {
+		this.units  = units;
 	}
 
-	public void clearAll(){
-		System.out.println("Clear All");
-		for (Actor a : getChildren()) {
-			System.out.println(a);
-			removeActor(a);
-		}
-		
+	public UnitContainer getUnits() {
+		return units;
 	}
-	
-	public final Base getBase() {
-		return parent;
-	}
-	
 }
