@@ -1,5 +1,7 @@
 package com.areacontrol.game;
 
+import java.util.logging.Level;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -8,8 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 public class AreaControl extends Game {
 	@Override
 	public void create () {
-            Assets.skin = new Skin(Gdx.files.internal("data/uiskin.json"));
-            setScreen(new MainMenuScreen(this));
+		Assets.log.log(Level.INFO,"Game Started");
+		Assets.log.setLevel(Level.FINER);
+		Assets.skin = new Skin(Gdx.files.internal("data/uiskin.json"));
+		setScreen(new MainMenuScreen(this));
+		Assets.setBuildTimeZero();
 	}
 	
 	@Override

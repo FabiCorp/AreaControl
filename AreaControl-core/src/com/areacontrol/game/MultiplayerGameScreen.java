@@ -66,41 +66,27 @@
  */
 package com.areacontrol.game;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Map;
-
-import org.json.JSONObject;
+import java.util.logging.Level;
 
 import appwarp.WarpController;
 import appwarp.WarpListener;
 import appwarp.WarpMessage;
-import javafx.scene.Scene;
-
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class MultiplayerGameScreen extends GameScreen implements Screen, WarpListener {
 
 	UnitContainer attacker;
 	UnitContainer defender;
 	boolean       startFight;
+	boolean       testMode;
 	public MultiplayerGameScreen (Game game) {
 		super(game);
 		WarpController.getInstance().setListener(this);
 		startFight = false;
+		testMode   = false;
 	}
 	
 	@Override
@@ -109,10 +95,15 @@ public class MultiplayerGameScreen extends GameScreen implements Screen, WarpLis
 		for (UnitContainer units : unitsMoving) {
 			if (units.haveArrived()){
 				attacker = units;
-				System.out.println("Player" + Assets.gameInfo.getPlayerID()+"sends message");
-				ACUnitContainerMessage message = new ACUnitContainerMessage(units);
-				units.setArrivedFalse();
+				Assets.log.log(Level.INFO,"Player " + Assets.gameInfo.getPlayerID()+" (Attacker) has units arriving, sends message");
+				if (testMode) {
+					ACStringMessage message = new ACStringMessage("M"+Assets.gameInfo.getPlayerID());
+					message.broadcast();
+				}else {
+				ACUnitContainerMessage message = new ACUnitContainerMessage(units,ACUnitContainerMessageType.PreFightFromAttacker);
 				message.broadcast();
+				}
+				units.setArrivedFalse();
 			}	
 		}	
 	}
@@ -121,15 +112,11 @@ public class MultiplayerGameScreen extends GameScreen implements Screen, WarpLis
 	public void update(float time) {
 		super.update(time);
 		
-		
 		if (startFight) {
-			Label l = new Label("Ready to Fight",Assets.skin);
-			l.setPosition(200, 200);
-			stage.addActor(l);
-			game.setScreen(new FightScreen(game, attacker, defender, this));
+			startFight = false;
+			Assets.log.log(Level.INFO,"Player " + Assets.gameInfo.getPlayerID()+" starting FightScreen");
+			game.setScreen(new MultiPlayerFightScreen(game, attacker, defender, this));
 		}	
-		
-		
 	};
 	
 	@Override
@@ -175,49 +162,54 @@ public class MultiplayerGameScreen extends GameScreen implements Screen, WarpLis
 	@Override
 	public void onGameUpdateReceived (WarpMessage message) {
 		
+		Assets.log.log(Level.INFO,"Player: " + Assets.gameInfo.getPlayerID());
+		
 		if (message instanceof ACStringMessage) {
 			ACStringMessage msg = (ACStringMessage) message;
-			System.out.println("Message Received" + msg.getString());
-			if (msg.getString() == "GameOver") {
-				System.out.println("Local User: " + WarpController.getInstance().getLocalUser() + "terminating");
-				//WarpController.getInstance().stopApp();
-				
-			}
+			Assets.log.log(Level.INFO,"Game Over Message Received" + msg.getString());
+			ACStringMessage msg2 = new ACStringMessage(msg.getString()+"."+Assets.gameInfo.getPlayerID());
+			msg2.broadcast();
 		}
 		else if (message instanceof ACUnitContainerMessage){
-			// we are being attacked !
+			// we are prefight
 			ACUnitContainerMessage msg = (ACUnitContainerMessage) message;
-			attacker = msg.getUnits();
-			System.out.println("Player: " + Assets.gameInfo.getPlayerID() + " received UnitContainer");
-			for(Map.Entry<String,ArrayList<Unit>> e : attacker.getSet()){
-				for (Unit u: e.getValue()){
-					System.out.println("Unit:"+u.getName());
+			Assets.log.log(Level.INFO,"Player: " + Assets.gameInfo.getPlayerID() + " received message of type " + msg.getMessageType());
+			switch(msg.getMessageType()) {
+			case PreFightFromAttacker:
+				attacker = msg.getUnits();
+				Assets.log.log(Level.INFO,"Player: " + Assets.gameInfo.getPlayerID() + " received attackers UnitContainer to start fight");
+				for(Map.Entry<String,ArrayList<Unit>> e : attacker.getSet()){
+					for (Unit u: e.getValue()){
+						Assets.log.log(Level.FINER,"Unit:"+u.getName());
+					}
 				}
-			}
-			Base defBase  = findBase(attacker.getTagetBaseID());
-			defender = defBase.getUnits();
-			System.out.println("Player: " + Assets.gameInfo.getPlayerID() + " Defenders UnitContainer");
-			for(Map.Entry<String,ArrayList<Unit>> e : defender.getSet()){
-				for (Unit u: e.getValue()){
-					System.out.println("Unit:"+u.getName());
+				Base defBase  = findBase(attacker.getTagetBaseID());
+				defender = defBase.getUnits();
+				Assets.log.log(Level.INFO,"Player: " + Assets.gameInfo.getPlayerID() + " sends defenders UnitContainer");
+				for(Map.Entry<String,ArrayList<Unit>> e : defender.getSet()){
+					for (Unit u: e.getValue()){
+						Assets.log.log(Level.FINER,"Unit:"+u.getName());
+					}
 				}
-			}
-
-			ACUnitContainerBaseMessage msg2 = new ACUnitContainerBaseMessage(defender);
-			msg2.broadcast();
-			startFight = true;
-		} else if (message instanceof ACUnitContainerBaseMessage){
-			// we are the attacker receiving the defending units !
-			// attacker must be set in the update loop
-			ACUnitContainerBaseMessage msg = (ACUnitContainerBaseMessage) message;
-			defender = msg.getUnits();
-			System.out.println("Player: " + Assets.gameInfo.getPlayerID() + " received UnitContainer");
-			for(Map.Entry<String,ArrayList<Unit>> e : defender.getSet()){
-				for (Unit u: e.getValue()){
-					System.out.println("Unit:"+u.getName());
+				ACUnitContainerMessage msg2 = new ACUnitContainerMessage(defender,ACUnitContainerMessageType.PreFightFromDefender);
+				msg2.broadcast();
+				startFight = true;
+				break;
+			case PreFightFromDefender:
+				// attacker must be set in the update loop
+				defender = msg.getUnits();
+				Assets.log.log(Level.INFO,"Player: " + Assets.gameInfo.getPlayerID() + " received defenders UnitContainer");
+				for(Map.Entry<String,ArrayList<Unit>> e : defender.getSet()){
+					for (Unit u: e.getValue()){
+						Assets.log.log(Level.FINEST,"Unit:"+u.getName());
+					}
 				}
+				startFight = true;
+				break;
+			default:
+				Assets.log.log(Level.INFO,"Player: " + Assets.gameInfo.getPlayerID() + " received illegal Message" + msg.getMessageType());
+				break;
 			}
-			startFight = true;
 		}
 	}
 }

@@ -76,14 +76,19 @@ import appwarp.WarpMessage;
 public class ACUnitContainerMessage extends WarpMessage {
 
 	private UnitContainer units;
-	
+	private ACUnitContainerMessageType type;
 	private static final long serialVersionUID = 1L;
 
-	public ACUnitContainerMessage(UnitContainer units) {
+	public ACUnitContainerMessage(UnitContainer units,ACUnitContainerMessageType type) {
 		this.units  = units;
+		this.type   = type;
 	}
 
 	public UnitContainer getUnits() {
 		return units;
+	}
+
+	public ACUnitContainerMessageType getMessageType() {
+		return type;
 	}
 }

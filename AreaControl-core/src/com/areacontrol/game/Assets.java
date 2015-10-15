@@ -3,6 +3,8 @@ package com.areacontrol.game;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Logger;
+
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
@@ -27,7 +29,7 @@ public class Assets {
 	public static float resourceRatePerWorker = 10.0f; 
 	public static Map<String,BaseComponentData> baseComponentData;
 
-	public static float fightTime = 0.5f; 
+	public static float fightTime = 0.5f;
 	public static void registerDialog(BaseDialog bd) {
 		if (baseDialog != null){
 			baseDialog.reset();
@@ -35,6 +37,15 @@ public class Assets {
 		}
 		baseDialog = bd;
 	}
+	
+	static void setBuildTimeZero(){
+		for(Map.Entry<String,BaseComponentData> e: baseComponentData.entrySet()){
+			e.getValue().setBuildTime(0.0f);
+		}
+		
+	}
+	
+	public static Logger log =  Logger.getLogger("com.areacontrol.game");
 	
 	static {
 		

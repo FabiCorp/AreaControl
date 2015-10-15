@@ -27,6 +27,7 @@ public class ConnectionListener implements ConnectionRequestListener {
 	@Override
 	public void onInitUDPDone (byte result) {
 		if(result==WarpResponseResultCode.SUCCESS){
+			
 			callBack.isUDPEnabled = true;
 		}
 	}

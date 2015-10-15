@@ -69,8 +69,6 @@ package com.areacontrol.game;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Random;
-
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
@@ -82,6 +80,7 @@ public class Unit extends UniqeUnitID implements Serializable {
 	String name;
 	float  health;
 	
+
 	public Unit(String name, int playerID) {
 		super(playerID);
 		this.name   = name;
@@ -102,8 +101,9 @@ public class Unit extends UniqeUnitID implements Serializable {
 	public String getId(){
 		return getName()+playerID + "."+unitID;
 	}
+	
 	public void attack(Unit u){
-		System.out.println("Unit: " + getId() + " attacks " + u.getId() + " H:"  + (int) u.health);
+		//System.out.println("Unit: " + getId() + " attacks " + u.getId() + " H:"  + (int) u.health);
 		float damage = Assets.randGen.nextFloat()*10; // take some shot
 		u.receiveDamage(damage);
 	}
@@ -160,5 +160,9 @@ public class Unit extends UniqeUnitID implements Serializable {
 
 	public boolean isAlive() {
 		return health>0;
+	}
+
+	public void update(Unit u) {
+		this.health = u.health;
 	}
 }

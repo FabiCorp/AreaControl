@@ -88,6 +88,9 @@ public class BaseComponentData {
 		builds = new ArrayList<String>();
 	}
 
+	public void setBuildTime(float f) {
+		buildTime = f;
+	}
 	public void addUnitBuilt(String s){
 		builds.add(s);
 	}

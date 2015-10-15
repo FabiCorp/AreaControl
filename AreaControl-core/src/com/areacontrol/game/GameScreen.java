@@ -66,6 +66,12 @@
  */
 package com.areacontrol.game;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -128,6 +134,37 @@ public class GameScreen implements Screen {
 
 	}
 	
+	public void checkSerialization(UnitContainer uc) {
+		ACUnitContainerMessage msg = new ACUnitContainerMessage(uc,ACUnitContainerMessageType.Undefined);
+		try {
+			FileOutputStream   fOut = new FileOutputStream("test.ser");
+			ObjectOutputStream oOut = new ObjectOutputStream(fOut);
+			oOut.writeObject(msg);	
+		    oOut.close();
+		    fOut.close();
+		    System.out.printf("Serialized data is saved");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			FileInputStream   fOut = new FileInputStream("test.ser");
+			ObjectInputStream oOut = new ObjectInputStream(fOut);
+			ACUnitContainerMessage msg1 = (ACUnitContainerMessage) (oOut.readObject());	
+		    oOut.close();
+		    fOut.close();
+		    System.out.printf("Serialized data is saved");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			System.out.println("Class not found in deserialization");
+			e.printStackTrace();
+		}
+	}
 	public void checkUnitsArrived() {
 		// single player version
 		Iterator<UnitContainer> iter = unitsMoving.iterator();
@@ -137,6 +174,8 @@ public class GameScreen implements Screen {
 				Base defBase           = findBase(units.getTagetBaseID());
 				UnitContainer defender = defBase.getUnits();
 				iter.remove();
+				//checkSerialization(defender);
+				//checkSerialization(units);
 				game.setScreen(new FightScreen(game, units, defender, this));
 			}	
 		}

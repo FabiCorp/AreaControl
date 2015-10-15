@@ -8,6 +8,7 @@ public abstract class WarpMessage implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	private String userName;
 	
 	public String getUserName() {

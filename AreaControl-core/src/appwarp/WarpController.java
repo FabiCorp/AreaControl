@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
@@ -17,11 +19,12 @@ import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultC
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomData;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomEvent;
 
+
+
 public class WarpController {
 
 	private static WarpController instance;
-	
-	private boolean showLog = true;
+	static int      messageCount = 0;
 	
 	private final String apiKey = "14a611b4b3075972be364a7270d9b69a5d2b24898ac483e32d4dc72b2df039ef";
 	private final String secretKey = "55216a9a165b08d93f9390435c9be4739888d971a17170591979e5837f618059";
@@ -30,13 +33,12 @@ public class WarpController {
 	
 	private String localUser;
 	
-	
 	private String roomId;
 	
 	private boolean isConnected = false;
-	boolean isUDPEnabled = false;
+	boolean         isUDPEnabled = false;
 	
-	private WarpListener warpListener ;
+	private WarpListener warpListener;
 	
 	private int STATE;
 	
@@ -51,7 +53,11 @@ public class WarpController {
 	public static final int GAME_LOOSE = 6;
 	public static final int ENEMY_LEFT = 7;
 	
+	private final Logger log;
+	
 	public WarpController() {
+		log = Logger.getLogger("WarpController");
+		log.setLevel(Level.FINEST);
 		initAppwarp();
 		warpClient.addConnectionRequestListener(new ConnectionListener(this));
 		warpClient.addChatRequestListener(new ChatListener(this));
@@ -62,6 +68,7 @@ public class WarpController {
 	
 	public static WarpController getInstance(){
 		if(instance == null){
+			Logger.getLogger("WarpController").log(Level.INFO,"Creating WarpController");
 			instance = new WarpController();
 		}
 		return instance;
@@ -105,7 +112,7 @@ public class WarpController {
 	}
 	
 	public void onConnectDone(boolean status){
-		log("onConnectDone: "+status);
+		log.log(Level.INFO, "onConnectDone: "+status);
 		if(status){
 			warpClient.initUDP();
 			warpClient.joinRoomInRange(1, 1, false);
@@ -128,14 +135,15 @@ public class WarpController {
 	}
 	
 	public void onJoinRoomDone(RoomEvent event){
-		log("onJoinRoomDone: "+event.getResult());
+		log.log(Level.INFO, "onJoinRoomDone: "+event.getResult());
 		if(event.getResult()==WarpResponseResultCode.SUCCESS){// success case
 			this.roomId = event.getData().getId();
 			warpClient.subscribeRoom(roomId);
 		}else if(event.getResult()==WarpResponseResultCode.RESOURCE_NOT_FOUND){// no such room found
 			HashMap<String, Object> data = new HashMap<String, Object>();
 			data.put("result", "");
-			warpClient.createRoom("superjumper", "shephertz", 2, data);
+			// warpClient.createRoom("superjumper", "shephertz", 2, data);
+			warpClient.createRoom("AreaControl", "FabiCorp", 2, data);
 		}else{
 			warpClient.disconnect();
 			handleError();
@@ -143,7 +151,7 @@ public class WarpController {
 	}
 	
 	public void onRoomSubscribed(String roomId){
-		log("onSubscribeRoomDone: "+roomId);
+		log.log(Level.INFO,"onSubscribeRoomDone: "+roomId);
 		if(roomId!=null){
 			isConnected = true;
 			warpClient.getLiveRoomInfo(roomId);
@@ -156,7 +164,7 @@ public class WarpController {
 	public void onGetLiveRoomInfo(String[] liveUsers){
 		
 		if(liveUsers!=null){
-			log("onGetLiveRoomInfo: "+liveUsers.length);
+			log.log(Level.INFO,"onGetLiveRoomInfo: "+liveUsers.length);
 			Assets.gameInfo.setPlayerID(liveUsers.length);
 			if(liveUsers.length==2){
 				startGame();	
@@ -180,11 +188,11 @@ public class WarpController {
 	}
 
 	public void onSendChatDone(boolean status){
-		log("onSendChatDone: "+status);
+		log.log(Level.INFO, "onSendChatDone: "+status);
 	}
 	
 	public void onGameUpdateReceived(WarpMessage message){
-//		log("onMoveUpdateReceived: message"+ message );
+		//System.out.println("onGameUpdateReceived: message from: " + message.getUserName() + " at: " + localUser);
 		String userName = message.getUserName();
 		if(!localUser.equals(userName)){
 			warpListener.onGameUpdateReceived(message);
@@ -193,13 +201,16 @@ public class WarpController {
 	
 	public void sendGameUpdate(WarpMessage msg){
 		msg.setUserName(localUser);
+	
 		try
 		{
 			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 			ObjectOutputStream out = new ObjectOutputStream(bOut);
 			out.writeObject(msg);
 			out.close();
-			
+			Logger.getLogger("WarpMessage").log(Level.FINEST,"Sending Message: " + localUser + " Size: " + bOut.size());
+			if (bOut.size()>999)
+				throw new IllegalArgumentException("Appwarp Buffer Too Long");
 			if(isConnected){
 				if(isUDPEnabled){
 					warpClient.sendUDPUpdatePeers(bOut.toByteArray());
@@ -215,6 +226,7 @@ public class WarpController {
 	}
 	
 	public void onResultUpdateReceived(String userName, int code){
+		log.log(Level.INFO, "ResultsUpdateReceived");
 		if(localUser.equals(userName)==false){
 			STATE = FINISHED;
 			warpListener.onGameFinished(code, true);
@@ -224,7 +236,7 @@ public class WarpController {
 	}
 	
 	public void onUserLeftRoom(String roomId, String userName){
-		log("onUserLeftRoom "+userName+" in room "+roomId);
+		log.log(Level.INFO, "onUserLeftRoom "+userName+" in room "+roomId);
 		if(STATE==STARTED && !localUser.equals(userName)){// Game Started and other user left the room
 			warpListener.onGameFinished(ENEMY_LEFT, true);
 		}
@@ -234,19 +246,15 @@ public class WarpController {
 		return this.STATE;
 	}
 	
-	private void log(String message){
-		if(showLog){
-			System.out.println(message);
-		}
-	}
-	
 	private void startGame(){
 		STATE = STARTED;
+		log.log(Level.INFO, "Game started");
 		warpListener.onGameStarted("Start the Game");
 	}
 	
 	private void waitForOtherUser(){
 		STATE = WAITING;
+		log.log(Level.INFO, "Waiting for other user");
 		warpListener.onWaitingStarted("Waiting for other user");
 	}
 	
@@ -258,6 +266,7 @@ public class WarpController {
 	}
 	
 	public void handleLeave(){
+		log.log(Level.INFO, "Leaving Room");
 		if(isConnected){
 			warpClient.unsubscribeRoom(roomId);
 			warpClient.leaveRoom(roomId);
@@ -269,6 +278,7 @@ public class WarpController {
 	}
 	
 	private void disconnect(){
+		log.log(Level.INFO, "Disconnecting");
 		warpClient.removeConnectionRequestListener(new ConnectionListener(this));
 		warpClient.removeChatRequestListener(new ChatListener(this));
 		warpClient.removeZoneRequestListener(new ZoneListener(this));

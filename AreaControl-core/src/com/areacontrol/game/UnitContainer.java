@@ -77,8 +77,8 @@ public class UnitContainer implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private int             playerId;
 	private Map<String,ArrayList<Unit>> units;
+	private int             playerId;
 	private int             baseMovingToId;
 	private float           timeToArrival;
 	UnitTransportState      transportState;
@@ -89,7 +89,6 @@ public class UnitContainer implements Serializable {
 		units = new HashMap<String,ArrayList<Unit>>();
 		transportState = UnitTransportState.UnitsNotSent;
 	}
-
 
 	public Iterable<Entry<String,ArrayList<Unit>>> getSet(){
 		return units.entrySet();
@@ -121,6 +120,10 @@ public class UnitContainer implements Serializable {
 		if (!units.containsKey(n))
 			units.put(n,new ArrayList<Unit>());
 		units.get(n).add(bc);		
+	}
+
+	public int getPlayerID(){
+		return playerId;
 	}
 
 	public void update(float time) {
