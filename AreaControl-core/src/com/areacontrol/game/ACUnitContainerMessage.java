@@ -91,4 +91,9 @@ public class ACUnitContainerMessage extends WarpMessage {
 	public ACUnitContainerMessageType getMessageType() {
 		return type;
 	}
+	
+	@Override
+	public void broadcast() {
+		
+	}
 }

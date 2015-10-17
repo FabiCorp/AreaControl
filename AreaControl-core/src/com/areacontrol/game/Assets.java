@@ -21,6 +21,8 @@ public class Assets {
 	public static int   singlePlayerMode = 1;
 	public static int   multiPlayerMode  = 2;
 	
+	public static boolean singleUnitMessages = true; 
+	
 	//public static float refreshTime = 0.1f;
 	
 	private static BaseDialog baseDialog = null;
