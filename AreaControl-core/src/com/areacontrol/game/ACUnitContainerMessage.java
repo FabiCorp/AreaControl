@@ -67,13 +67,16 @@
  */
 package com.areacontrol.game;
 
-import appwarp.WarpMessage;
+import java.util.ArrayList;
+import java.util.Map;
+
+import appwarp.SerializableWarpMessage;
 
 /**
  * @author Wolfgang Wenzel
  *
  */
-public class ACUnitContainerMessage extends WarpMessage {
+public class ACUnitContainerMessage extends SerializableWarpMessage {
 
 	private UnitContainer units;
 	private ACUnitContainerMessageType type;
@@ -94,6 +97,14 @@ public class ACUnitContainerMessage extends WarpMessage {
 	
 	@Override
 	public void broadcast() {
-		
+		/*if (Assets.singleUnitMessages){
+			for(Map.Entry<String,ArrayList<Unit>> e : units.getSet()){
+				for (Unit u: e.getValue()){
+					ACUnitMessage msg = new ACUnitMessage(u);
+					msg.broadcast();
+				}
+			}
+		} else*/
+		super.broadcast();
 	}
 }

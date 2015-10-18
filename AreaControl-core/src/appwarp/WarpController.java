@@ -4,6 +4,7 @@ package appwarp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.logging.Level;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 import org.json.JSONObject;
 
 import com.areacontrol.game.Assets;
+import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Json;
 import com.shephertz.app42.gaming.multiplayer.client.Constants;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
@@ -32,7 +34,7 @@ public class WarpController {
 	private WarpClient warpClient;
 	
 	private String localUser;
-	
+	private byte   localUserID;
 	private String roomId;
 	
 	private boolean isConnected = false;
@@ -42,6 +44,7 @@ public class WarpController {
 	
 	private int STATE;
 	
+
 	// Game state constants
 	public static final int WAITING = 1;
 	public static final int STARTED = 2;
@@ -64,6 +67,10 @@ public class WarpController {
 		warpClient.addZoneRequestListener(new ZoneListener(this));
 		warpClient.addRoomRequestListener(new RoomListener(this));
 		warpClient.addNotificationListener(new NotificationListener(this));
+	}
+	
+	public byte getLocalUserID(){
+		return localUserID;
 	}
 	
 	public static WarpController getInstance(){
@@ -165,6 +172,7 @@ public class WarpController {
 		
 		if(liveUsers!=null){
 			log.log(Level.INFO,"onGetLiveRoomInfo: "+liveUsers.length);
+			localUserID = (byte) liveUsers.length;
 			Assets.gameInfo.setPlayerID(liveUsers.length);
 			if(liveUsers.length==2){
 				startGame();	
@@ -192,37 +200,22 @@ public class WarpController {
 	}
 	
 	public void onGameUpdateReceived(WarpMessage message){
-		//System.out.println("onGameUpdateReceived: message from: " + message.getUserName() + " at: " + localUser);
-		String userName = message.getUserName();
-		if(!localUser.equals(userName)){
+		System.out.println("onGameUpdateReceived: message from: " + message.getUserID() + " at: " + localUserID);
+		if(localUserID != message.getUserID()){
 			warpListener.onGameUpdateReceived(message);
 		}
 	}
 	
-	public void sendGameUpdate(WarpMessage msg){
-		msg.setUserName(localUser);
-	
-		try
-		{
-			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-			ObjectOutputStream out = new ObjectOutputStream(bOut);
-			out.writeObject(msg);
-			out.close();
-			Logger.getLogger("WarpMessage").log(Level.FINEST,"Sending Message: " + localUser + " Size: " + bOut.size());
-			if (bOut.size()>999)
-				throw new IllegalArgumentException("Appwarp Buffer Too Long");
-			if(isConnected){
-				if(isUDPEnabled){
-					warpClient.sendUDPUpdatePeers(bOut.toByteArray());
-				}else{
-					warpClient.sendUpdatePeers(bOut.toByteArray());
-				}
+	public void sendGameUpdate(OutgoingWarpMessage msg){
+		msg.setUserName(localUserID);
+		if(isConnected){
+			if(isUDPEnabled){
+				warpClient.sendUDPUpdatePeers(msg.toByteArray());
+			}else{
+				warpClient.sendUDPUpdatePeers(msg.toByteArray());
 			}
-		}catch(IOException i)
-		{
-			i.printStackTrace();
-		}
-	
+		}	
+		
 	}
 	
 	public void onResultUpdateReceived(String userName, int code){

@@ -1,8 +1,9 @@
 package com.areacontrol.game;
 
-import appwarp.WarpMessage;
+import appwarp.SerializableWarpMessage;
 
-public class ACStringMessage extends WarpMessage {
+
+public class ACStringMessage extends SerializableWarpMessage {
 
 	private static final long serialVersionUID = 1L;
 	String s;

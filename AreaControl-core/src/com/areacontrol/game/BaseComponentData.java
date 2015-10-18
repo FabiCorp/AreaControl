@@ -72,18 +72,21 @@ public class BaseComponentData {
 	private int     resourceCost;
 	private int     startBase;   // only occupied bases
 	private int     maxPerBase;
+	private int     health;
+	
 	private float   buildTime;
 	private boolean isUnit;
 	private String  builtBy;      // the building which makes the unit or building 
 	
 	ArrayList<String> builds;
-	public BaseComponentData(int resourceCost,int startPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy){
+	public BaseComponentData(int resourceCost,int startPerBase, int maxPerBase, float buildTime,boolean isUnit,String builtBy,int health){
 		this.resourceCost = resourceCost;
 		this.maxPerBase   = maxPerBase;
 		this.startBase    = startPerBase;
 		this.buildTime    = buildTime;
 		this.isUnit  	  = isUnit;
 		this.builtBy      = builtBy;
+		this.health       = health;
 		
 		builds = new ArrayList<String>();
 	}
@@ -121,6 +124,10 @@ public class BaseComponentData {
 
 	public int getMaxPerBase() {
 		return maxPerBase;
+	}
+
+	public float getHealth() {
+		return health;
 	}
 
 

@@ -21,7 +21,7 @@ public class Assets {
 	public static int   singlePlayerMode = 1;
 	public static int   multiPlayerMode  = 2;
 	
-	public static boolean singleUnitMessages = true; 
+	// public static boolean singleUnitMessages = true; 
 	
 	//public static float refreshTime = 0.1f;
 	
@@ -52,36 +52,36 @@ public class Assets {
 	static {
 		
 		baseComponentData = new HashMap<String,BaseComponentData>();
-	    	                                  // Cost, Min, Max, Time, Unit?, BuiltBy
+	    	                                  // Cost, Start#, Max#, Time, Unit?, BuiltBy
 		
 		BaseComponentData b;
 		
-		baseComponentData.put("Worker"  ,      new BaseComponentData(  50, 3, 10, 5.0f, false, ""));
-		baseComponentData.put("Barracks",  b = new BaseComponentData( 150, 1,  5,10.0f, false, ""));
+		baseComponentData.put("Worker"  ,      new BaseComponentData(  50, 3, 10, 5.0f, false, "", 100));
+		baseComponentData.put("Barracks",  b = new BaseComponentData( 150, 1,  5,10.0f, false, "", 100));
 		b.addUnitBuilt("Marine");
 		b.addUnitBuilt("Spy");
 		b.addUnitBuilt("Factory");
 		
-		baseComponentData.put("Factory" ,  b = new BaseComponentData( 150, 0,  5,20.0f, false, ""));
+		baseComponentData.put("Factory" ,  b = new BaseComponentData( 150, 0,  5,20.0f, false, "",100));
 		b.addUnitBuilt("Tank");
 		b.addUnitBuilt("AirBase");
 		
-		baseComponentData.put("AirBase" ,  b = new BaseComponentData( 150, 0,  5,20.0f, false, ""));
+		baseComponentData.put("AirBase" ,  b = new BaseComponentData( 150, 0,  5,20.0f, false, "",100));
 		b.addUnitBuilt("Bomber");
 		
-		baseComponentData.put("Research",  b = new BaseComponentData( 300, 0,  1,30.0f, false, ""));
+		baseComponentData.put("Research",  b = new BaseComponentData( 300, 0,  1,30.0f, false, "",100));
 		b.addUnitBuilt("Shields");
 		b.addUnitBuilt("Attack");
 		//b.addUnitBuilt("Armour");
 		//b.addUnitBuilt("Stealth");
 		
-		baseComponentData.put("Shields",  b = new BaseComponentData( 300, 0,  3, 60.0f, false, "Research"));
-		baseComponentData.put("Attack",   b = new BaseComponentData( 300, 0,  3, 60.0f, false, "Research"));
+		baseComponentData.put("Shields",  b = new BaseComponentData( 300, 0,  3, 60.0f, false, "Research",0));
+		baseComponentData.put("Attack",   b = new BaseComponentData( 300, 0,  3, 60.0f, false, "Research",0));
 		
-		baseComponentData.put("Marine",    new BaseComponentData(  50, 0, 20,10.0f, true, "Barracks"));
-		baseComponentData.put("Spy",       new BaseComponentData( 200, 1, 10,10.0f, true, "Barracks"));
-		baseComponentData.put("Tank",      new BaseComponentData( 200, 0, 20,10.0f, true, "Factory"));
-		baseComponentData.put("Bomber",    new BaseComponentData( 200, 0, 20,10.0f, true, "AirBase"));
+		baseComponentData.put("Marine",    new BaseComponentData(  50, 0, 20,10.0f, true, "Barracks",20));
+		baseComponentData.put("Spy",       new BaseComponentData( 200, 1, 10,10.0f, true, "Barracks",10));
+		baseComponentData.put("Tank",      new BaseComponentData( 200, 0, 20,10.0f, true, "Factory", 50));
+		baseComponentData.put("Bomber",    new BaseComponentData( 200, 0, 20,10.0f, true, "AirBase",100));
 		
 		
 	}

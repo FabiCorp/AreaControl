@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.LobbyData;
@@ -40,9 +42,27 @@ public class NotificationListener implements NotifyListener{
 		try
 		{
 			ByteArrayInputStream bIn = new ByteArrayInputStream(event.getUpdate());
-			ObjectInputStream in = new ObjectInputStream(bIn);
-			msg = (WarpMessage) in.readObject();
-			in.close();
+			// the last byte in the array is the player ID
+			// the second-to-last byte is the messgage Type
+			byte msgBuffer[] = new byte[1];
+			int  flag = bIn.read(msgBuffer);
+			if (flag<0){
+				throw new ArrayIndexOutOfBoundsException("onUpdatePeersReceived no msgType in buffer");
+			}
+			Logger.getLogger("NotificationListener").log(Level.FINER,"Message received: " + msgBuffer[0]);
+			System.out.println("Message received: " + msgBuffer[0]);
+			
+			if (msgBuffer[0]==0){
+				// serializable WarpMessage
+				ObjectInputStream in = new ObjectInputStream(bIn);
+				msg = (WarpMessage) in.readObject();
+				in.close();
+			} 
+			flag = bIn.read(msgBuffer);
+			if (flag<0){
+				throw new ArrayIndexOutOfBoundsException("onUpdatePeersReceived no userID in buffer");
+			}
+			msg.setUserID(msgBuffer[0]);
 		}catch(IOException i)
 		{
 			i.printStackTrace();

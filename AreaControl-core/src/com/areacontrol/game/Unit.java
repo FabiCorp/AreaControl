@@ -84,7 +84,7 @@ public class Unit extends UniqeUnitID implements Serializable {
 	public Unit(String name, int playerID) {
 		super(playerID);
 		this.name   = name;
-		this.health = 100;
+		this.health = Assets.baseComponentData.get(name).getHealth();
 	}
 	
 	public String getName() {
